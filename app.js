@@ -60,6 +60,33 @@ const DAYS = [
 const state = JSON.parse(localStorage.getItem("commute-japanese-week1") || '{"day":0,"done":[],"mistakes":{},"score":""}');
 const lesson = document.querySelector("#lesson");
 const tabs = document.querySelector("#dayTabs");
+let audioToastTimer;
+
+function showAudioStatus(message) {
+  const toast = document.querySelector("#audioToast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(audioToastTimer);
+  audioToastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function speakJP(text) {
+  if (!("speechSynthesis" in window)) {
+    showAudioStatus("이 브라우저는 음성 재생을 지원하지 않아요.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "ja-JP";
+  utterance.rate = 0.72;
+  utterance.pitch = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const japaneseVoice = voices.find(voice => voice.lang.toLowerCase().startsWith("ja"));
+  if (japaneseVoice) utterance.voice = japaneseVoice;
+  utterance.onerror = () => showAudioStatus("일본어 음성을 재생하지 못했어요. 기기의 일본어 음성을 확인해 주세요.");
+  window.speechSynthesis.speak(utterance);
+  showAudioStatus(`재생 중 · ${text.replaceAll("、", " ")}`);
+}
 
 function save() {
   localStorage.setItem("commute-japanese-week1", JSON.stringify(state));
@@ -87,23 +114,34 @@ function renderLesson() {
   const done = state.done.includes(state.day);
   lesson.innerHTML = `
     <div class="lesson-head">
-      <div class="meta">DAY ${String(state.day + 1).padStart(2, "0")} · 20~30 MIN</div>
-      <h2>${day.title}</h2>
-      <p>글자를 보고 소리부터 말한 뒤 힌트를 확인하세요.</p>
+      <div class="lesson-head-row">
+        <div>
+          <div class="meta">DAY ${String(state.day + 1).padStart(2, "0")} · 20~30 MIN</div>
+          <h2>${day.title}</h2>
+          <p>글자를 보고 소리부터 말한 뒤 힌트를 확인하세요.</p>
+        </div>
+        <button class="listen-all" type="button" onclick="speakJP('${day.letters.map(([jp]) => jp).join("、")}')">🔊 오늘 글자 전체 듣기</button>
+      </div>
     </div>
     <div class="lesson-body">
       <div class="block-title"><h3>오늘의 새 글자</h3><span>${day.letters.length}개 · 약 10분</span></div>
+      <p class="audio-guide">재생 버튼을 누르고 한 번 들은 뒤, 두 번째에는 바로 따라 말해 보세요.</p>
       <div class="letters-grid">
         ${day.letters.map(([jp, en, ko, hint]) => `
           <article class="letter-card">
-            <strong lang="ja">${jp}</strong><span class="sound">${en} · ${ko}</span><small>${hint}</small>
+            <strong lang="ja">${jp}</strong>
+            <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
+            <span class="sound">${en} · ${ko}</span><small>${hint}</small>
           </article>`).join("")}
       </div>
       <div class="tip"><b>발음 포인트</b>${day.tip}</div>
       <div class="block-title"><h3>여행에서 만날 단어</h3><span>글자씩 짚으며 읽기</span></div>
       <div class="word-list">
         ${day.words.map(([jp, ko, meaning]) => `
-          <div class="word"><strong lang="ja">${jp}</strong><span>${ko}</span><em>${meaning}</em></div>`).join("")}
+          <div class="word">
+            <strong lang="ja">${jp}</strong><span>${ko}</span><em>${meaning}</em>
+            <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
+          </div>`).join("")}
       </div>
       <div class="quiz">
         <div class="quiz-head"><h3>3초 읽기 퀴즈</h3><button class="reveal-button" id="reveal" type="button">정답 보기</button></div>

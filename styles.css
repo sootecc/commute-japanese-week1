@@ -163,6 +163,18 @@ main { overflow: hidden; }
 .lesson-head .meta { color: #79d4b4; font-size: 12px; font-weight: 800; letter-spacing: .11em; }
 .lesson-head h2 { margin: 8px 0 7px; font-size: 32px; }
 .lesson-head p { margin: 0; color: #c8d6de; }
+.lesson-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.listen-all {
+  flex: 0 0 auto;
+  padding: 11px 15px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 99px;
+  color: white;
+  background: rgba(255,255,255,.1);
+  font-size: 12px;
+  font-weight: 800;
+}
+.listen-all:hover { background: rgba(255,255,255,.18); }
 .lesson-body {
   padding: 34px;
   border-radius: 0 0 28px 28px;
@@ -173,10 +185,25 @@ main { overflow: hidden; }
 .block-title h3 { margin: 0; font-size: 22px; }
 .block-title span { color: var(--muted); font-size: 12px; }
 .letters-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.letter-card { min-height: 132px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #fcfdfc; }
+.letter-card { position: relative; min-height: 132px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #fcfdfc; }
 .letter-card strong { display: block; color: var(--navy); font: 700 38px/1.15 "Noto Sans JP"; }
 .letter-card .sound { display: block; margin-top: 7px; color: var(--teal); font-size: 12px; font-weight: 800; }
 .letter-card small { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.audio-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--mint);
+  font-size: 14px;
+  font-weight: 800;
+}
+.letter-card .audio-button { position: absolute; top: 13px; right: 13px; }
+.audio-button:hover { color: white; background: var(--teal); }
 .tip {
   margin: 16px 0 44px;
   padding: 17px 19px;
@@ -190,7 +217,7 @@ main { overflow: hidden; }
 .word-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .word {
   display: grid;
-  grid-template-columns: minmax(90px, 1fr) 1fr auto;
+  grid-template-columns: minmax(90px, 1fr) 1fr auto 32px;
   align-items: center;
   gap: 10px;
   padding: 16px 18px;
@@ -200,6 +227,31 @@ main { overflow: hidden; }
 .word strong { color: var(--navy); font: 700 19px "Noto Sans JP"; }
 .word span { color: var(--muted); font-size: 12px; }
 .word em { color: var(--ink); font-size: 13px; font-style: normal; }
+.word .audio-button { justify-self: end; }
+.audio-guide {
+  margin: -3px 0 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.audio-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 30;
+  max-width: calc(100vw - 40px);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: white;
+  background: var(--navy);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.audio-toast.show { opacity: 1; transform: translateY(0); }
 .quiz { margin-top: 44px; padding: 26px; border-radius: 20px; background: var(--cream); }
 .quiz-head { display: flex; align-items: center; justify-content: space-between; }
 .quiz h3 { margin: 0; }
@@ -254,9 +306,12 @@ footer a { color: white; text-decoration: none; }
   .stats { width: 100%; justify-content: space-between; }
   .lesson-head, .lesson-body { padding: 24px 18px; }
   .lesson-head h2 { font-size: 27px; }
+  .lesson-head-row { align-items: flex-start; flex-direction: column; }
+  .listen-all { align-self: stretch; }
   .letters-grid { grid-template-columns: repeat(2, 1fr); }
   .letter-card { min-height: 112px; }
   .word-list { grid-template-columns: 1fr; }
+  .word { grid-template-columns: minmax(82px, 1fr) 1fr auto 32px; }
   .quiz { padding: 20px 16px; }
   .quiz-row { font-size: 19px; letter-spacing: .04em; }
   .record { flex-direction: column; }
