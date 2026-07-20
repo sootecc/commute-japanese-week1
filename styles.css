@@ -1,0 +1,272 @@
+:root {
+  --ink: #17232d;
+  --muted: #687884;
+  --navy: #173447;
+  --teal: #1f8a70;
+  --mint: #e6f4ef;
+  --cream: #fff4df;
+  --coral: #e66b4f;
+  --paper: #f7f8f5;
+  --line: #dbe3e6;
+  --white: #fff;
+  --shadow: 0 18px 60px rgba(21, 51, 69, .1);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 64px;
+  padding: 0 max(20px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  background: rgba(23, 52, 71, .96);
+  backdrop-filter: blur(16px);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: inherit;
+  font-weight: 800;
+  text-decoration: none;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--navy);
+  background: #78d1b3;
+  font-family: "Noto Sans JP", sans-serif;
+}
+.progress-mini { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+.progress-track { width: 68px; height: 5px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.2); }
+.progress-track span { display: block; width: 0; height: 100%; background: #f3aa62; transition: width .3s ease; }
+
+main { overflow: hidden; }
+.hero {
+  position: relative;
+  min-height: 540px;
+  padding: 80px max(24px, calc((100vw - 1060px) / 2)) 72px;
+  overflow: hidden;
+  color: white;
+  background: var(--navy);
+}
+.eyebrow, .section-kicker {
+  display: block;
+  margin-bottom: 15px;
+  color: #72d0b0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+.hero h1 {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  margin: 0;
+  font-size: clamp(44px, 8vw, 84px);
+  line-height: 1.1;
+  letter-spacing: -.055em;
+}
+.hero h1 em { color: #ffc078; font-style: normal; }
+.hero p { position: relative; z-index: 2; margin: 27px 0 32px; color: #d7e5eb; font-size: 17px; line-height: 1.8; }
+.primary-button {
+  position: relative;
+  z-index: 2;
+  min-width: 190px;
+  padding: 16px 23px;
+  border: 0;
+  border-radius: 99px;
+  color: var(--navy);
+  background: #77d2b3;
+  font-weight: 800;
+  box-shadow: 0 10px 35px rgba(0,0,0,.15);
+}
+.primary-button:hover { transform: translateY(-2px); }
+.hero-note { margin-top: 13px; color: #99b0be; font-size: 12px; }
+.hero-glyphs { position: absolute; right: -40px; bottom: -90px; width: 430px; height: 430px; opacity: .1; }
+.hero-glyphs span { position: absolute; font: 800 170px/1 "Noto Sans JP"; }
+.hero-glyphs span:nth-child(1) { left: 0; top: 0; transform: rotate(-12deg); }
+.hero-glyphs span:nth-child(2) { right: 0; top: 95px; transform: rotate(9deg); }
+.hero-glyphs span:nth-child(3) { left: 110px; bottom: 0; transform: rotate(-4deg); }
+
+.dashboard {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 64px 24px 38px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+}
+.dashboard h2, .week-check h2 { margin: 0; font-size: clamp(28px, 5vw, 44px); letter-spacing: -.04em; }
+.stats { display: flex; gap: 34px; }
+.stats div { display: flex; flex-direction: column; align-items: center; }
+.stats strong { font-size: 32px; }
+.stats span { color: var(--muted); font-size: 12px; }
+
+.day-tabs {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 24px 26px;
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.day-tabs::-webkit-scrollbar { display: none; }
+.day-tab {
+  flex: 0 0 auto;
+  min-width: 70px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--muted);
+  background: white;
+  text-align: left;
+}
+.day-tab span { display: block; font-size: 10px; font-weight: 700; }
+.day-tab strong { display: block; margin-top: 2px; color: var(--ink); font-size: 15px; }
+.day-tab.active { color: white; border-color: var(--navy); background: var(--navy); box-shadow: 0 8px 20px rgba(23,52,71,.18); }
+.day-tab.active strong { color: white; }
+.day-tab.done::after { content: "✓"; float: right; margin-top: -22px; color: var(--teal); font-weight: 800; }
+.day-tab.active.done::after { color: #77d2b3; }
+
+.lesson-shell {
+  max-width: 1060px;
+  margin: 0 auto 90px;
+  padding: 0 24px;
+}
+.lesson-head {
+  padding: 34px;
+  border-radius: 28px 28px 0 0;
+  color: white;
+  background: var(--navy);
+}
+.lesson-head .meta { color: #79d4b4; font-size: 12px; font-weight: 800; letter-spacing: .11em; }
+.lesson-head h2 { margin: 8px 0 7px; font-size: 32px; }
+.lesson-head p { margin: 0; color: #c8d6de; }
+.lesson-body {
+  padding: 34px;
+  border-radius: 0 0 28px 28px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+.block-title { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin: 8px 0 18px; }
+.block-title h3 { margin: 0; font-size: 22px; }
+.block-title span { color: var(--muted); font-size: 12px; }
+.letters-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.letter-card { min-height: 132px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #fcfdfc; }
+.letter-card strong { display: block; color: var(--navy); font: 700 38px/1.15 "Noto Sans JP"; }
+.letter-card .sound { display: block; margin-top: 7px; color: var(--teal); font-size: 12px; font-weight: 800; }
+.letter-card small { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.tip {
+  margin: 16px 0 44px;
+  padding: 17px 19px;
+  border-radius: 15px;
+  color: #245846;
+  background: var(--mint);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.tip b { margin-right: 8px; }
+.word-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.word {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 15px;
+  background: #f1f4f5;
+}
+.word strong { color: var(--navy); font: 700 19px "Noto Sans JP"; }
+.word span { color: var(--muted); font-size: 12px; }
+.word em { color: var(--ink); font-size: 13px; font-style: normal; }
+.quiz { margin-top: 44px; padding: 26px; border-radius: 20px; background: var(--cream); }
+.quiz-head { display: flex; align-items: center; justify-content: space-between; }
+.quiz h3 { margin: 0; }
+.quiz-row { margin-top: 18px; font: 700 23px/1.7 "Noto Sans JP"; letter-spacing: .08em; }
+.reveal-button { padding: 8px 13px; border: 1px solid #e8cda2; border-radius: 99px; color: #9a603a; background: white; font-size: 12px; font-weight: 800; }
+.answer { margin-top: 14px; padding-top: 14px; border-top: 1px solid #ead6b5; color: #80573b; font-size: 13px; line-height: 1.8; }
+.day-review { margin: 25px 0 0; padding: 20px; border-left: 4px solid var(--teal); background: #f2f8f6; }
+.day-review strong { display: block; margin-bottom: 5px; }
+.day-review span { color: var(--muted); font-size: 13px; }
+.record { margin-top: 18px; display: flex; gap: 10px; }
+.mistake-input { min-width: 0; flex: 1; padding: 14px 16px; border: 1px solid var(--line); border-radius: 13px; outline: none; }
+.mistake-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,138,112,.1); }
+.complete-button { padding: 14px 19px; border: 0; border-radius: 13px; color: white; background: var(--teal); font-weight: 800; }
+.complete-button.done { color: #245846; background: var(--mint); }
+
+.week-check {
+  max-width: 1012px;
+  margin: 0 auto 80px;
+  padding: 52px;
+  border-radius: 30px;
+  color: white;
+  background: var(--navy);
+}
+.section-kicker.coral { color: #ffaf83; }
+.week-check > p { color: #c6d5dd; }
+.check-card { margin-top: 14px; padding: 22px; border-radius: 18px; color: var(--ink); background: white; }
+.check-card span { display: block; margin-bottom: 11px; color: var(--teal); font-size: 12px; font-weight: 800; }
+.check-card strong { font: 600 21px/1.8 "Noto Sans JP"; }
+.score-label { display: block; margin-top: 28px; color: #ffbd91; font-weight: 800; }
+.score-row { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
+.score-row input { width: 78px; padding: 13px; border: 0; border-radius: 12px; font-size: 18px; font-weight: 800; }
+.score-row button { margin-left: auto; padding: 13px 17px; border: 0; border-radius: 12px; color: var(--navy); background: #79d4b4; font-weight: 800; }
+.score-result { margin-top: 18px; padding: 18px; border-radius: 14px; color: var(--navy); background: #fff1d6; line-height: 1.65; }
+
+footer {
+  padding: 32px max(24px, calc((100vw - 1060px) / 2));
+  display: flex;
+  justify-content: space-between;
+  color: #a7bac5;
+  background: #102a3a;
+  font-size: 12px;
+}
+footer a { color: white; text-decoration: none; }
+
+@media (max-width: 760px) {
+  .topbar { height: 58px; }
+  .brand span:last-child { display: none; }
+  .hero { min-height: 495px; padding-top: 64px; }
+  .hero p { font-size: 15px; }
+  .hero-glyphs { right: -180px; opacity: .07; }
+  .dashboard { padding-top: 46px; align-items: flex-start; flex-direction: column; }
+  .stats { width: 100%; justify-content: space-between; }
+  .lesson-head, .lesson-body { padding: 24px 18px; }
+  .lesson-head h2 { font-size: 27px; }
+  .letters-grid { grid-template-columns: repeat(2, 1fr); }
+  .letter-card { min-height: 112px; }
+  .word-list { grid-template-columns: 1fr; }
+  .quiz { padding: 20px 16px; }
+  .quiz-row { font-size: 19px; letter-spacing: .04em; }
+  .record { flex-direction: column; }
+  .week-check { margin-inline: 16px; padding: 30px 20px; }
+  .check-card strong { font-size: 18px; }
+  .score-row { flex-wrap: wrap; }
+  .score-row button { width: 100%; margin: 6px 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
