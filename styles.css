@@ -122,16 +122,33 @@ main { overflow: hidden; }
 .stats strong { font-size: 32px; }
 .stats span { color: var(--muted); font-size: 12px; }
 
-.day-tabs {
+.month-tabs, .week-tabs, .day-tabs {
   max-width: 1060px;
   margin: 0 auto;
-  padding: 0 24px 26px;
   display: flex;
   gap: 9px;
   overflow-x: auto;
   scrollbar-width: none;
 }
-.day-tabs::-webkit-scrollbar { display: none; }
+.month-tabs { padding: 0 24px 14px; }
+.week-tabs { padding: 0 24px 14px; }
+.day-tabs { padding: 0 24px 26px; }
+.month-tabs::-webkit-scrollbar, .week-tabs::-webkit-scrollbar, .day-tabs::-webkit-scrollbar { display: none; }
+.month-tab, .week-tab {
+  flex: 1 0 180px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  color: var(--muted);
+  background: white;
+  text-align: left;
+}
+.month-tab span, .week-tab span { display: block; color: var(--teal); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+.month-tab strong, .week-tab strong { display: block; margin: 4px 0 2px; color: var(--ink); }
+.month-tab small, .week-tab small { display: block; color: var(--muted); font-size: 10px; }
+.month-tab.active { color: white; border-color: var(--navy); background: var(--navy); }
+.month-tab.active span, .month-tab.active strong, .month-tab.active small { color: white; }
+.week-tab.active { border-color: #78cdb1; background: var(--mint); box-shadow: inset 0 0 0 1px #78cdb1; }
 .day-tab {
   flex: 0 0 auto;
   min-width: 70px;
@@ -219,10 +236,15 @@ main { overflow: hidden; }
 .block-title h3 { margin: 0; font-size: 22px; }
 .block-title span { color: var(--muted); font-size: 12px; }
 .letters-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.letters-grid.phrase-grid { grid-template-columns: repeat(2, 1fr); }
 .letter-card { position: relative; min-height: 132px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #fcfdfc; }
 .letter-card strong { display: block; color: var(--navy); font: 700 38px/1.15 "Noto Sans JP"; }
 .letter-card .sound { display: block; margin-top: 7px; color: var(--teal); font-size: 12px; font-weight: 800; }
 .letter-card small { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.phrase-card { min-height: 165px; padding: 20px; }
+.phrase-card strong { max-width: calc(100% - 40px); font-size: 20px; line-height: 1.5; }
+.phrase-card .sound { margin-top: 12px; font-size: 13px; line-height: 1.55; }
+.phrase-card small { line-height: 1.6; }
 .test-toggle {
   padding: 8px 12px;
   border: 1px solid var(--line);
@@ -364,6 +386,7 @@ main { overflow: hidden; }
 .listening-choices.answered button { pointer-events: none; opacity: .55; }
 .listening-choices button.correct { color: var(--navy); border-color: #79d4b4; background: #79d4b4; opacity: 1; }
 .listening-choices button.wrong { border-color: #ff9a7e; background: #a8493a; opacity: 1; }
+.listening-choices.meaning-choices button { font: 700 12px/1.45 "Noto Sans KR"; }
 .listening-feedback { min-height: 20px; margin-top: 12px; color: #d4e1e7; font-size: 12px; }
 .listening-result { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,.08); }
 .listening-result strong { color: #79d4b4; font-size: 23px; }
@@ -377,6 +400,16 @@ main { overflow: hidden; }
 .day-review { margin: 25px 0 0; padding: 20px; border-left: 4px solid var(--teal); background: #f2f8f6; }
 .day-review strong { display: block; margin-bottom: 5px; }
 .day-review span { color: var(--muted); font-size: 13px; }
+.more-study {
+  margin-top: 18px;
+  padding: 23px;
+  border-radius: 18px;
+  color: white;
+  background: linear-gradient(135deg, #7f4d3b, #b5654c);
+}
+.more-study h3 { margin: 5px 0 8px; }
+.more-study p { margin: 0; color: #ffe5d8; font-size: 12px; line-height: 1.75; }
+.more-study button { margin-top: 14px; padding: 10px 14px; border: 0; border-radius: 10px; color: #7f4d3b; background: white; font-weight: 800; }
 .record { margin-top: 18px; display: flex; gap: 10px; }
 .mistake-input { min-width: 0; flex: 1; padding: 14px 16px; border: 1px solid var(--line); border-radius: 13px; outline: none; }
 .mistake-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,138,112,.1); }
@@ -429,7 +462,9 @@ footer a { color: white; text-decoration: none; }
   .study-routine > div:first-child, .weak-tray > div:first-child { align-items: flex-start; flex-direction: column; }
   .routine-list { grid-template-columns: repeat(2, 1fr); }
   .letters-grid { grid-template-columns: repeat(2, 1fr); }
+  .letters-grid.phrase-grid { grid-template-columns: 1fr; }
   .letter-card { min-height: 112px; }
+  .phrase-card { min-height: 0; }
   .word-list { grid-template-columns: 1fr; }
   .word { grid-template-columns: minmax(82px, 1fr) 1fr auto 32px; }
   .quiz { padding: 20px 16px; }

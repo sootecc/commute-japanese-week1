@@ -25,9 +25,9 @@
 
   <main id="top">
     <section class="hero">
-      <div class="eyebrow">WEEK 01 · HIRAGANA</div>
-      <h1>오늘 아침,<br><em>글자 열 개</em>만.</h1>
-      <p>완전 초급자를 위한 20~30분 일본어 루틴.<br>보고, 읽고, 틀린 글자만 남겨요.</p>
+      <div class="eyebrow">20 WEEKS · JAPAN TRAVEL</div>
+      <h1>5개월 뒤에는,<br><em>일본어로 여행</em>하기.</h1>
+      <p>문자부터 자유 대화까지 이어지는 140일 루틴.<br>하루 20~30분, 잘 붙는 날은 한 걸음 더 가요.</p>
       <button class="primary-button" id="resumeButton" type="button">오늘 학습 시작</button>
       <div class="hero-note">저장 버튼 없이 이 기기에 자동 기록됩니다.</div>
       <div class="hero-glyphs" aria-hidden="true">
@@ -37,48 +37,33 @@
 
     <section class="dashboard">
       <div>
-        <span class="section-kicker">THIS WEEK</span>
-        <h2>기본 46자부터 탁음까지</h2>
+        <span class="section-kicker">FIVE MONTHS</span>
+        <h2>문자에서 여행 대화까지</h2>
       </div>
       <div class="stats">
-        <div><strong>7</strong><span>일</span></div>
-        <div><strong>66</strong><span>새 글자</span></div>
-        <div><strong>34</strong><span>여행 단어</span></div>
+        <div><strong>140</strong><span>일</span></div>
+        <div><strong>20</strong><span>주</span></div>
+        <div><strong>20</strong><span>분/일</span></div>
       </div>
     </section>
 
+    <nav class="month-tabs" id="monthTabs" aria-label="월 선택"></nav>
+    <nav class="week-tabs" id="weekTabs" aria-label="주차 선택"></nav>
     <nav class="day-tabs" id="dayTabs" aria-label="날짜 선택"></nav>
 
     <section class="lesson-shell" id="lesson" aria-live="polite"></section>
 
-    <section class="week-check" id="weekCheck">
-      <span class="section-kicker coral">WEEKEND CHECK</span>
-      <h2>주말 점검</h2>
-      <p>표를 가리고 읽어 보세요. 3초 안에 읽으면 1점입니다.</p>
-      <div class="check-card">
-        <span>낱글자 · 20점</span>
-        <strong lang="ja">ぬ　き　れ　し　む　を　へ　つ　ら　ほ<br>じ　が　ず　で　ぶ　ど　ぜ　ば　ぎ　ぼ</strong>
-      </div>
-      <div class="check-card">
-        <span>여행 단어 · 10점</span>
-        <strong lang="ja">えき　すし　なに　みせ　いくら<br>かぎ　みず　ごはん　でぐち　でんわ</strong>
-      </div>
-      <label class="score-label" for="scoreInput">내 점수</label>
-      <div class="score-row">
-        <input id="scoreInput" type="number" min="0" max="35" inputmode="numeric" placeholder="0">
-        <span>/ 35점</span>
-        <button id="scoreButton" type="button">다음 주 난이도 보기</button>
-      </div>
-      <div id="scoreResult" class="score-result" hidden></div>
-    </section>
+    <section class="week-check" id="weekCheck"></section>
   </main>
 
   <footer>
-    <span>5개월 뒤 일본 여행을 위한 첫 주</span>
+    <span>5개월 뒤 일본 여행을 위한 140일 과정</span>
     <a href="#top">맨 위로 ↑</a>
   </footer>
 
   <div class="audio-toast" id="audioToast" role="status" aria-live="polite"></div>
+  <script src="./month-data.js"></script>
+  <script src="./five-month-data.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

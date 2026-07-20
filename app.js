@@ -57,14 +57,19 @@ const DAYS = [
   }
 ];
 
+DAYS.push(...window.EXTRA_DAYS);
+
 const state = JSON.parse(localStorage.getItem("commute-japanese-week1") || '{"day":0,"done":[],"mistakes":{},"score":""}');
 state.weak ||= [];
 state.routine ||= {};
 state.listeningScores ||= {};
 state.speechRate ||= 0.72;
 state.testMode ||= false;
+state.weekScores ||= {};
 const lesson = document.querySelector("#lesson");
 const tabs = document.querySelector("#dayTabs");
+const weekTabs = document.querySelector("#weekTabs");
+const monthTabs = document.querySelector("#monthTabs");
 let audioToastTimer;
 let listeningSession = null;
 
@@ -144,19 +149,20 @@ function renderListeningQuestion() {
       <button class="quiz-start" type="button" onclick="startListeningQuiz()">다시 도전</button>`;
     return;
   }
-  const letters = DAYS[state.day].letters.map(([jp]) => jp);
-  const target = letters[Math.floor(Math.random() * letters.length)];
-  const choices = shuffled([target, ...shuffled(letters.filter(item => item !== target)).slice(0, 3)]);
-  listeningSession.target = target;
+  const day = DAYS[state.day];
+  const items = day.letters;
+  const targetItem = items[Math.floor(Math.random() * items.length)];
+  const choices = shuffled([targetItem, ...shuffled(items.filter(item => item[0] !== targetItem[0])).slice(0, 3)]);
+  listeningSession.target = targetItem[0];
   listeningSession.round += 1;
   host.innerHTML = `
     <div class="listening-progress">문제 ${listeningSession.round} / 5 · 현재 ${listeningSession.score}점</div>
-    <button class="listen-prompt" type="button" onclick="speakJP('${target}')">🔊 소리 다시 듣기</button>
-    <div class="listening-choices">
-      ${choices.map(choice => `<button type="button" onclick="answerListening('${choice}', this)">${choice}</button>`).join("")}
+    <button class="listen-prompt" type="button" onclick="speakJP('${targetItem[0]}')">🔊 소리 다시 듣기</button>
+    <div class="listening-choices ${day.kind === "phrase" ? "meaning-choices" : ""}">
+      ${choices.map(choice => `<button type="button" data-answer="${choice[0]}" onclick="answerListening('${choice[0]}', this)">${day.kind === "phrase" ? choice[2] : choice[0]}</button>`).join("")}
     </div>
-    <div class="listening-feedback" id="listeningFeedback">소리를 듣고 글자를 골라 보세요.</div>`;
-  speakJP(target);
+    <div class="listening-feedback" id="listeningFeedback">소리를 듣고 ${day.kind === "phrase" ? "뜻을" : "글자를"} 골라 보세요.</div>`;
+  speakJP(targetItem[0]);
 }
 
 function answerListening(choice, button) {
@@ -165,9 +171,9 @@ function answerListening(choice, button) {
   if (correct) listeningSession.score += 1;
   button.parentElement.classList.add("answered");
   button.classList.add(correct ? "correct" : "wrong");
-  const correctButton = [...button.parentElement.children].find(item => item.textContent === listeningSession.target);
+  const correctButton = [...button.parentElement.children].find(item => item.dataset.answer === listeningSession.target);
   if (correctButton) correctButton.classList.add("correct");
-  document.querySelector("#listeningFeedback").textContent = correct ? "정답이에요!" : `정답은 ${listeningSession.target}`;
+  document.querySelector("#listeningFeedback").textContent = correct ? "정답이에요!" : "정답을 표시했어요. 소리를 한 번 더 들어 보세요.";
   setTimeout(renderListeningQuestion, 850);
 }
 
@@ -178,22 +184,73 @@ function save() {
 
 function updateProgress() {
   const count = state.done.length;
-  document.querySelector("#progressText").textContent = `${count} / 7일`;
-  document.querySelector("#progressBar").style.width = `${(count / 7) * 100}%`;
-  document.querySelectorAll(".day-tab").forEach((tab, i) => tab.classList.toggle("done", state.done.includes(i)));
+  document.querySelector("#progressText").textContent = `${count} / 140일`;
+  document.querySelector("#progressBar").style.width = `${(count / 140) * 100}%`;
+  document.querySelectorAll(".day-tab").forEach(tab => tab.classList.toggle("done", state.done.includes(Number(tab.dataset.day))));
+}
+
+function renderWeekTabs() {
+  const currentWeek = Math.floor(state.day / 7);
+  const currentMonth = Math.floor(currentWeek / 4);
+  const startWeek = currentMonth * 4;
+  weekTabs.innerHTML = window.WEEK_INFO.slice(startWeek, startWeek + 4).map((week, offset) => {
+    const i = startWeek + offset;
+    const complete = DAYS.slice(i * 7, i * 7 + 7).filter((_, offset) => state.done.includes(i * 7 + offset)).length;
+    return `<button class="week-tab ${i === currentWeek ? "active" : ""}" type="button" onclick="selectWeek(${i})">
+      <span>WEEK ${i + 1} · ${complete}/7</span><strong>${week.title}</strong><small>${week.subtitle}</small>
+    </button>`;
+  }).join("");
+}
+
+function renderMonthTabs() {
+  const currentMonth = Math.floor(state.day / 28);
+  const monthNames = ["문자·생존 표현", "회화의 뼈대", "여행 상황 정복", "듣기·즉답", "모의여행·자유 대화"];
+  monthTabs.innerHTML = monthNames.map((name, i) => {
+    const complete = DAYS.slice(i * 28, i * 28 + 28).filter((_, offset) => state.done.includes(i * 28 + offset)).length;
+    return `<button class="month-tab ${i === currentMonth ? "active" : ""}" type="button" onclick="selectMonth(${i})">
+      <span>MONTH ${i + 1}</span><strong>${name}</strong><small>${complete}/28일 완료</small>
+    </button>`;
+  }).join("");
 }
 
 function renderTabs() {
-  tabs.innerHTML = DAYS.map((day, i) => `
+  const currentWeek = Math.floor(state.day / 7);
+  const start = currentWeek * 7;
+  tabs.innerHTML = DAYS.slice(start, start + 7).map((day, offset) => {
+    const i = start + offset;
+    return `
     <button class="day-tab ${i === state.day ? "active" : ""}" data-day="${i}" type="button">
       <span>DAY ${String(i + 1).padStart(2, "0")}</span><strong>${day.title.split(" ")[0]}</strong>
-    </button>`).join("");
+    </button>`;
+  }).join("");
   tabs.querySelectorAll("button").forEach(button => button.addEventListener("click", () => selectDay(Number(button.dataset.day))));
   updateProgress();
 }
 
+function selectWeek(week) {
+  const firstDay = week * 7;
+  if (state.day < firstDay || state.day > firstDay + 6) state.day = firstDay;
+  save();
+  renderWeekTabs();
+  renderTabs();
+  renderLesson();
+  renderWeekCheck();
+}
+
+function selectMonth(month) {
+  const firstDay = month * 28;
+  if (state.day < firstDay || state.day > firstDay + 27) state.day = firstDay;
+  save();
+  renderMonthTabs();
+  renderWeekTabs();
+  renderTabs();
+  renderLesson();
+  renderWeekCheck();
+}
+
 function renderLesson() {
   const day = DAYS[state.day];
+  const isPhrase = day.kind === "phrase";
   const done = state.done.includes(state.day);
   const routine = state.routine[state.day] || [false, false, false, false];
   const weakToday = day.letters.filter(([jp]) => state.weak.includes(jp));
@@ -204,7 +261,7 @@ function renderLesson() {
         <div>
           <div class="meta">DAY ${String(state.day + 1).padStart(2, "0")} · 20~30 MIN</div>
           <h2>${day.title}</h2>
-          <p>글자를 보고 소리부터 말한 뒤 힌트를 확인하세요.</p>
+          <p>${isPhrase ? "상황을 떠올리고 일본어 문장 전체를 따라 말하세요." : "글자를 보고 소리부터 말한 뒤 힌트를 확인하세요."}</p>
         </div>
         <div class="audio-actions">
           <select id="speechRate" aria-label="음성 속도">
@@ -212,7 +269,7 @@ function renderLesson() {
             <option value="0.72" ${state.speechRate === 0.72 ? "selected" : ""}>천천히</option>
             <option value="0.88" ${state.speechRate === 0.88 ? "selected" : ""}>보통</option>
           </select>
-          <button class="listen-all" type="button" onclick="speakToday()">🔊 오늘 글자 전체 듣기</button>
+          <button class="listen-all" type="button" onclick="speakToday()">🔊 오늘 ${isPhrase ? "표현" : "글자"} 전체 듣기</button>
         </div>
       </div>
     </div>
@@ -220,33 +277,34 @@ function renderLesson() {
       <div class="study-routine">
         <div><b>오늘의 20분 루틴</b><span>전부 완벽하게 하려 하지 말고 순서만 지켜요.</span></div>
         <div class="routine-list">
-          ${["전체 듣기 1회", "글자 따라 말하기 2회", "듣기 퀴즈 3점 이상", "여행 단어 따라 말하기 1회"].map((label, i) => `
+          ${["전체 듣기 1회", `${isPhrase ? "표현" : "글자"} 따라 말하기 2회`, "듣기 퀴즈 3점 이상", "핵심 단어 따라 말하기 1회"].map((label, i) => `
             <label><input type="checkbox" data-routine="${i}" ${routine[i] ? "checked" : ""} onchange="setRoutine(${i}, this.checked)"><span>${label}</span></label>`).join("")}
         </div>
       </div>
       <div class="block-title">
-        <h3>오늘의 새 글자</h3>
+        <h3>오늘의 ${isPhrase ? "핵심 표현" : "새 글자"}</h3>
         <button class="test-toggle ${state.testMode ? "active" : ""}" type="button" onclick="toggleTestMode()">${state.testMode ? "힌트 보이기" : "힌트 가리고 테스트"}</button>
       </div>
       <p class="audio-guide">재생 버튼을 누르고 한 번 들은 뒤, 두 번째에는 바로 따라 말해 보세요.</p>
-      <div class="letters-grid">
+      <div class="letters-grid ${isPhrase ? "phrase-grid" : ""}">
         ${day.letters.map(([jp, en, ko, hint]) => `
-          <article class="letter-card">
+          <article class="letter-card ${isPhrase ? "phrase-card" : ""}">
             <strong lang="ja">${jp}</strong>
             <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
-            <span class="sound">${en} · ${ko}</span><small>${hint}</small>
+            <span class="sound">${en ? `${en} · ` : ""}${ko}</span><small>${hint}</small>
             <button class="weak-button ${state.weak.includes(jp) ? "active" : ""}" type="button" onclick="toggleWeak('${jp}')" aria-label="${jp} 복습 표시">${state.weak.includes(jp) ? "★ 복습 중" : "☆ 헷갈려요"}</button>
           </article>`).join("")}
       </div>
-      <div class="tip"><b>발음 포인트</b>${day.tip}</div>
+      <div class="tip"><b>${isPhrase ? "회화 포인트" : "발음 포인트"}</b>${day.tip}</div>
       <div class="weak-tray">
-        <div><b>복습 바구니</b><span>헷갈리는 글자만 모아 다음 날 먼저 들어요.</span></div>
+        <div><b>복습 바구니</b><span>헷갈리는 ${isPhrase ? "표현" : "글자"}만 모아 다음 날 먼저 들어요.</span></div>
         <div class="weak-chips">
-          ${state.weak.length ? state.weak.map(jp => `<button type="button" onclick="speakJP('${jp}')">${jp} <span>▶</span></button>`).join("") : "<small>아직 표시한 글자가 없어요.</small>"}
+          ${state.weak.length ? state.weak.slice(-12).map(jp => `<button type="button" onclick="speakJP('${jp}')">${jp} <span>▶</span></button>`).join("") : "<small>아직 표시한 항목이 없어요.</small>"}
+          ${state.weak.length > 12 ? `<small>최근 12개 표시 · 전체 ${state.weak.length}개</small>` : ""}
         </div>
-        ${weakToday.length ? `<p>오늘 글자 중 ${weakToday.length}개가 복습 중이에요.</p>` : ""}
+        ${weakToday.length ? `<p>오늘 ${isPhrase ? "표현" : "글자"} 중 ${weakToday.length}개가 복습 중이에요.</p>` : ""}
       </div>
-      <div class="block-title"><h3>여행에서 만날 단어</h3><span>글자씩 짚으며 읽기</span></div>
+      <div class="block-title"><h3>핵심 단어</h3><span>소리로 듣고 뜻 연결하기</span></div>
       <div class="word-list">
         ${day.words.map(([jp, ko, meaning]) => `
           <div class="word">
@@ -255,18 +313,24 @@ function renderLesson() {
           </div>`).join("")}
       </div>
       <div class="listening-quiz">
-        <div class="quiz-head"><div><span class="mini-label">ACTIVE RECALL</span><h3>소리만 듣고 글자 고르기</h3></div><b>최고 ${state.listeningScores[state.day] || 0} / 5</b></div>
+        <div class="quiz-head"><div><span class="mini-label">ACTIVE RECALL</span><h3>소리만 듣고 ${isPhrase ? "뜻" : "글자"} 고르기</h3></div><b>최고 ${state.listeningScores[state.day] || 0} / 5</b></div>
         <p>화면을 보지 않고 먼저 소리를 들은 뒤 선택하세요. 3점 이상이면 오늘 루틴 통과입니다.</p>
         <div id="listeningQuizBody"><button class="quiz-start" type="button" onclick="startListeningQuiz()">5문제 시작</button></div>
       </div>
       <div class="quiz">
-        <div class="quiz-head"><h3>3초 읽기 퀴즈</h3><button class="reveal-button" id="reveal" type="button">정답 보기</button></div>
-        <div class="quiz-row" lang="ja">${day.quiz.join("<br>")}</div>
+        <div class="quiz-head"><h3>${isPhrase ? "한국어를 보고 즉답하기" : "3초 읽기 퀴즈"}</h3><button class="reveal-button" id="reveal" type="button">정답 보기</button></div>
+        <div class="quiz-row ${isPhrase ? "meaning-quiz" : ""}">${day.quiz.join("<br>")}</div>
         <div class="answer" id="answer" hidden>${day.answer}</div>
       </div>
       <div class="day-review"><strong>짧은 복습</strong><span>${day.review}</span></div>
+      <div class="more-study">
+        <span class="mini-label">GOOD DAY BONUS · 15 MIN</span>
+        <h3>공부가 잘 붙는 날엔 여기까지</h3>
+        <p>${day.bonus || "듣기 퀴즈 5점에 도전하고 복습 바구니 표현을 모두 한 번씩 말해 보세요."}</p>
+        ${state.day < DAYS.length - 1 ? `<button type="button" onclick="selectDay(${state.day + 1})">다음 날 미리 보기 →</button>` : ""}
+      </div>
       <div class="record">
-        <input class="mistake-input" id="mistakes" value="${state.mistakes[state.day] || ""}" placeholder="헷갈린 글자 입력 · 예: ぬ, ね" aria-label="헷갈린 글자">
+        <input class="mistake-input" id="mistakes" value="${state.mistakes[state.day] || ""}" placeholder="오늘 막힌 ${isPhrase ? "표현" : "글자"} 메모" aria-label="오늘 막힌 내용">
         <button class="complete-button ${done ? "done" : ""}" id="complete" type="button">${done ? "오늘 학습 완료 ✓" : "오늘 학습 완료"}</button>
       </div>
     </div>`;
@@ -289,6 +353,8 @@ function renderLesson() {
     else state.done.push(state.day);
     save();
     renderLesson();
+    renderMonthTabs();
+    renderWeekTabs();
     renderTabs();
   });
 }
@@ -296,8 +362,11 @@ function renderLesson() {
 function selectDay(index, scroll = true) {
   state.day = index;
   save();
+  renderMonthTabs();
+  renderWeekTabs();
   renderTabs();
   renderLesson();
+  renderWeekCheck();
   if (scroll) lesson.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -306,17 +375,39 @@ document.querySelector("#resumeButton").addEventListener("click", () => {
   selectDay(next === -1 ? 0 : next);
 });
 
-document.querySelector("#scoreInput").value = state.score;
-document.querySelector("#scoreButton").addEventListener("click", () => {
-  const score = Math.max(0, Math.min(35, Number(document.querySelector("#scoreInput").value)));
-  state.score = score;
+function renderWeekCheck() {
+  const week = Math.floor(state.day / 7);
+  const check = window.WEEK_CHECKS[week];
+  const savedScore = state.weekScores[week] ?? "";
+  document.querySelector("#weekCheck").innerHTML = `
+    <span class="section-kicker coral">WEEK ${week + 1} CHECK</span>
+    <h2>${check.title}</h2>
+    <p>${check.description}</p>
+    ${check.groups.map(([label, content]) => `<div class="check-card"><span>${label}</span><strong>${content}</strong></div>`).join("")}
+    <label class="score-label" for="scoreInput">내 점수</label>
+    <div class="score-row">
+      <input id="scoreInput" type="number" min="0" max="${check.max}" inputmode="numeric" value="${savedScore}" placeholder="0">
+      <span>/ ${check.max}점</span>
+      <button id="scoreButton" type="button">다음 학습 강도 보기</button>
+    </div>
+    <div id="scoreResult" class="score-result" hidden></div>`;
+  document.querySelector("#scoreButton").addEventListener("click", () => gradeWeek(week, check.max));
+}
+
+function gradeWeek(week, max) {
+  const score = Math.max(0, Math.min(max, Number(document.querySelector("#scoreInput").value)));
+  state.weekScores[week] = score;
   save();
   const result = document.querySelector("#scoreResult");
-  if (score >= 30) result.innerHTML = "<strong>빠른 진도</strong><br>2주차는 새 글자 10개/일 + 오답 3개로 진행하면 좋아요.";
-  else if (score >= 24) result.innerHTML = "<strong>기본 진도</strong><br>2주차는 새 글자 8개/일 + 오답 5개로 진행하면 좋아요.";
-  else result.innerHTML = "<strong>복습 중심</strong><br>2주차는 새 글자 6개/일 + 기본 46자 이틀 복습으로 시작해요.";
+  const ratio = max ? score / max : 0;
+  if (ratio >= .85) result.innerHTML = "<strong>선행 가능</strong><br>다음 주 기본 분량에 보너스 15분을 주 2~3회 더해도 좋아요.";
+  else if (ratio >= .65) result.innerHTML = "<strong>기본 진도 유지</strong><br>지금 속도가 적당해요. 복습 바구니만 매일 먼저 확인하세요.";
+  else result.innerHTML = "<strong>복습 우선</strong><br>다음 주 첫 이틀은 새 진도 전에 이번 주 역할극을 한 번씩 반복하세요.";
   result.hidden = false;
-});
+}
 
+renderMonthTabs();
+renderWeekTabs();
 renderTabs();
 renderLesson();
+renderWeekCheck();
