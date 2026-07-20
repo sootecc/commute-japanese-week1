@@ -1,0 +1,7 @@
+{
+  "voice": "ja-JP-NanamiNeural",
+  "locale": "ja-JP",
+  "readingPolicy": "curated aliases plus Japanese lexical analysis",
+  "generatedAt": "2026-07-20T13:17:32.571977+00:00",
+  "entries": 747
+}

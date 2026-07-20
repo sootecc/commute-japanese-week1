@@ -169,7 +169,7 @@ const PRONUNCIATION_DAYS = [
 
 DAYS.push(...window.EXTRA_DAYS);
 
-const state = JSON.parse(localStorage.getItem("commute-japanese-week1") || '{"day":0,"done":[],"mistakes":{},"score":""}');
+const state = JSON.parse(localStorage.getItem("commute-japanese-week1") || '{"day":0,"done":[],"mistakes":{}}');
 state.weak ||= [];
 state.routine ||= {};
 if (!state.audioVersion || state.audioVersion < 2) {
@@ -183,6 +183,7 @@ state.showKoreanReading ??= false;
 state.testMode ||= false;
 delete state.listeningScores;
 delete state.weekScores;
+delete state.score;
 const lesson = document.querySelector("#lesson");
 const tabs = document.querySelector("#dayTabs");
 const weekTabs = document.querySelector("#weekTabs");
@@ -190,6 +191,7 @@ const monthTabs = document.querySelector("#monthTabs");
 let audioToastTimer;
 let listeningSession = null;
 let activeFixedAudio = null;
+let fixedSequenceId = 0;
 
 function showAudioStatus(message) {
   const toast = document.querySelector("#audioToast");
@@ -197,6 +199,13 @@ function showAudioStatus(message) {
   toast.classList.add("show");
   clearTimeout(audioToastTimer);
   audioToastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function stopAudioPlayback() {
+  fixedSequenceId += 1;
+  activeFixedAudio?.pause();
+  activeFixedAudio = null;
+  window.speechSynthesis?.cancel();
 }
 
 function getJapaneseVoices() {
@@ -235,12 +244,14 @@ function voiceOptionLabel(voice, index) {
 function speakJP(text, rateOverride = null) {
   const fixedSource = window.STANDARD_AUDIO?.[text];
   if (fixedSource) {
+    fixedSequenceId += 1;
     window.speechSynthesis?.cancel();
     activeFixedAudio?.pause();
     activeFixedAudio = new Audio(fixedSource);
     activeFixedAudio.playbackRate = rateOverride ?? state.speechRate;
-    activeFixedAudio.play().catch(() => showAudioStatus("고정 표준 음성을 재생하지 못했어요."));
-    showAudioStatus("재생 중 · 고정 표준 음성");
+    activeFixedAudio.preservesPitch = true;
+    activeFixedAudio.play().catch(() => showAudioStatus("고정 기준 음성을 재생하지 못했어요."));
+    showAudioStatus("재생 중 · 고정 기준 음성");
     return;
   }
   if (!("speechSynthesis" in window)) {
@@ -261,6 +272,37 @@ function speakJP(text, rateOverride = null) {
   utterance.onerror = () => showAudioStatus("일본어 음성을 재생하지 못했어요. 기기의 일본어 음성을 확인해 주세요.");
   window.speechSynthesis.speak(utterance);
   showAudioStatus(`재생 중 · ${voiceOptionLabel(japaneseVoice, -1)}`);
+}
+
+async function speakFixedSequence(texts, rateOverride = null) {
+  const sequenceId = fixedSequenceId + 1;
+  fixedSequenceId = sequenceId;
+  window.speechSynthesis?.cancel();
+  activeFixedAudio?.pause();
+  showAudioStatus(`재생 중 · 고정 기준 음성 ${texts.length}개`);
+
+  for (const text of texts) {
+    if (fixedSequenceId !== sequenceId) return;
+    const source = window.STANDARD_AUDIO?.[text];
+    if (!source) {
+      showAudioStatus("고정 기준 음성 일부를 찾지 못했어요.");
+      return;
+    }
+    const audio = new Audio(source);
+    activeFixedAudio = audio;
+    audio.playbackRate = rateOverride ?? state.speechRate;
+    audio.preservesPitch = true;
+    try {
+      await new Promise((resolve, reject) => {
+        audio.addEventListener("ended", resolve, { once: true });
+        audio.addEventListener("error", reject, { once: true });
+        audio.play().catch(reject);
+      });
+    } catch {
+      showAudioStatus("고정 기준 음성을 재생하지 못했어요.");
+      return;
+    }
+  }
 }
 
 function togglePrecisionMode() {
@@ -355,6 +397,7 @@ function renderMoraStrip(text) {
 }
 
 function renderPrecisionPanel(day, pronunciation) {
+  const fixedAudioReady = Object.keys(window.STANDARD_AUDIO || {}).length > 0;
   const sources = pronunciation?.sources || [
     ["도쿄외국어대 · 일본어 발음", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/"],
     ["OJAD · 표준어 악센트 사전", "https://www.gavo.t.u-tokyo.ac.jp/ojad/kor/pages/home"]
@@ -379,7 +422,9 @@ function renderPrecisionPanel(day, pronunciation) {
             <p>${pronunciationDetail(text, romanization, day.kind === "phrase")}</p>
           </article>`).join("")}
       </div>
-      <p class="tts-caution">다른 언어 목소리로 대체 재생하지 않습니다. 현재는 기기의 일본어(일본) 음성을 사용하며, 고정 표준 음성 파일이 연결되면 같은 버튼에서 자동으로 그 음성을 우선 재생합니다.</p>
+      <p class="tts-caution">${fixedAudioReady
+        ? "모든 재생 버튼은 같은 일본어 기준 음성 파일을 사용합니다. 자연 속도를 발음 기준으로 듣고, 분해 속도는 소리 연결을 확인할 때만 사용하세요."
+        : "다른 언어 목소리로 대체 재생하지 않습니다. 현재는 기기의 일본어(일본) 음성을 사용하며, 고정 기준 음성 파일이 연결되면 같은 버튼에서 자동으로 그 음성을 우선 재생합니다."}</p>
       <div class="source-links">
         <span>발음 원리·악센트 기준</span>
         ${sources.map(([label, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`).join("")}
@@ -388,8 +433,12 @@ function renderPrecisionPanel(day, pronunciation) {
 }
 
 function speakToday() {
-  const text = DAYS[state.day].letters.map(([jp]) => jp).join("、");
-  speakJP(text);
+  const texts = DAYS[state.day].letters.map(([jp]) => jp);
+  if (texts.every(text => window.STANDARD_AUDIO?.[text])) {
+    speakFixedSequence(texts);
+  } else {
+    speakJP(texts.join("、"));
+  }
   setRoutine(0, true);
 }
 
@@ -555,6 +604,7 @@ function renderTabs() {
 }
 
 function selectWeek(week) {
+  stopAudioPlayback();
   const firstDay = week * 7;
   if (state.day < firstDay || state.day > firstDay + 6) state.day = firstDay;
   save();
@@ -565,6 +615,7 @@ function selectWeek(week) {
 }
 
 function selectMonth(month) {
+  stopAudioPlayback();
   const firstDay = month * 28;
   if (state.day < firstDay || state.day > firstDay + 27) state.day = firstDay;
   save();
@@ -586,6 +637,8 @@ function renderLesson() {
   const weakToday = day.letters.filter(([jp]) => state.weak.includes(jp));
   const japaneseVoices = getJapaneseVoices();
   const activeVoice = getJapaneseVoice();
+  const fixedAudioCount = Object.keys(window.STANDARD_AUDIO || {}).length;
+  const fixedAudioReady = fixedAudioCount > 0;
   listeningSession = null;
   lesson.innerHTML = `
     <div class="lesson-head">
@@ -598,8 +651,10 @@ function renderLesson() {
             : isPhrase ? "상황을 떠올리고 일본어 문장 전체를 따라 말하세요." : "글자를 보고 소리부터 말한 뒤 힌트를 확인하세요."}</p>
         </div>
         <div class="audio-actions">
-          <select id="speechVoice" aria-label="일본어 목소리" ${japaneseVoices.length ? "" : "disabled"}>
-            ${japaneseVoices.length
+          <select id="speechVoice" aria-label="일본어 목소리" ${fixedAudioReady || !japaneseVoices.length ? "disabled" : ""}>
+            ${fixedAudioReady
+              ? `<option value="">고정 기준 음성 · ${fixedAudioCount}개</option>`
+              : japaneseVoices.length
               ? japaneseVoices.map((voice, index) => `<option value="${encodeURIComponent(voice.voiceURI)}" ${voice.voiceURI === activeVoice?.voiceURI ? "selected" : ""}>${voiceOptionLabel(voice, index)}</option>`).join("")
               : '<option value="">일본어(일본) 음성 없음</option>'}
           </select>
@@ -610,7 +665,9 @@ function renderLesson() {
             <option value="1" ${state.speechRate === 1 ? "selected" : ""}>자연스럽게</option>
           </select>
           <button class="listen-all" type="button" onclick="speakToday()">🔊 오늘 ${isPhrase ? "표현" : "글자"} 전체 듣기</button>
-          <span class="voice-status">${activeVoice
+          <span class="voice-status">${fixedAudioReady
+            ? `고정 기준 음성 · 일본어(일본) · 전체 ${fixedAudioCount}개`
+            : activeVoice
             ? `일본어(일본) · ${activeVoice.localService ? "기기 음성" : "온라인 음성"} · 다른 언어 대체 없음`
             : "일본어(일본) 전용 음성이 없어 재생이 잠겨 있어요."}</span>
         </div>
@@ -636,7 +693,9 @@ function renderLesson() {
         <button class="test-toggle ${state.testMode ? "active" : ""}" type="button" onclick="toggleTestMode()">${state.testMode ? "힌트 보이기" : "힌트 가리고 테스트"}</button>
       </div>
       <p class="audio-guide">${precisionEnabled
-        ? "먼저 ▶만 눌러 듣고 소리를 흉내 낸 다음 글자를 확인하세요. 기기 음성은 반복 연습용입니다."
+        ? fixedAudioReady
+          ? "먼저 자연 ▶으로 전체 높낮이와 박자를 듣고 흉내 낸 다음, 분해 ▶으로 연결을 확인하세요."
+          : "먼저 ▶만 눌러 듣고 소리를 흉내 낸 다음 글자를 확인하세요. 기기 음성은 반복 연습용입니다."
         : "재생 버튼을 누르고 한 번 들은 뒤, 두 번째에는 바로 따라 말해 보세요."}</p>
       <div class="letters-grid ${isPhrase ? "phrase-grid" : ""}">
         ${day.letters.map(([jp, en, ko, hint]) => `
@@ -700,12 +759,14 @@ function renderLesson() {
     save();
     showAudioStatus(`재생 속도 · ${event.target.options[event.target.selectedIndex].text}`);
   });
-  document.querySelector("#speechVoice").addEventListener("change", event => {
-    state.speechVoiceURI = decodeURIComponent(event.target.value);
-    save();
-    showAudioStatus(`목소리 · ${event.target.options[event.target.selectedIndex].text}`);
-    speakJP(day.letters[0][0]);
-  });
+  if (!fixedAudioReady) {
+    document.querySelector("#speechVoice").addEventListener("change", event => {
+      state.speechVoiceURI = decodeURIComponent(event.target.value);
+      save();
+      showAudioStatus(`목소리 · ${event.target.options[event.target.selectedIndex].text}`);
+      speakJP(day.letters[0][0]);
+    });
+  }
   document.querySelector("#mistakes").addEventListener("input", event => {
     state.mistakes[state.day] = event.target.value;
     save();
@@ -722,6 +783,7 @@ function renderLesson() {
 }
 
 function selectDay(index, scroll = true) {
+  stopAudioPlayback();
   state.day = index;
   save();
   renderMonthTabs();
