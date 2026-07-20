@@ -57,6 +57,123 @@ const DAYS = [
   }
 ];
 
+const PRONUNCIATION_DAYS = [
+  {
+    focus: "う는 ‘우’가 아니에요",
+    headline: "입술을 내밀지 않고, 혀의 뒤쪽만 가볍게 올려 짧게 냅니다.",
+    cues: [
+      ["입술", "둥글게 오므리지 말고 힘을 뺀 상태를 유지해요."],
+      ["혀", "혀의 뒤쪽을 올리되 목에 힘을 주지 않아요."],
+      ["길이", "あ・い・う・え・お를 같은 한 박자로 말해요."]
+    ],
+    mora: { word: "えき", tokens: ["え", "き"], note: "두 글자를 늘이지 않고 같은 길이의 두 박자로 말해요." },
+    practice: [["う", "입술 확인"], ["うえ", "두 모음 연결"], ["えき", "두 박자 단어"]],
+    recordText: "うえ",
+    sources: [
+      ["도쿄외국어대 · 일본어 모음", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-07-01.php"]
+    ]
+  },
+  {
+    focus: "し・ち・つ를 한글 한 글자로 고정하지 않기",
+    headline: "つ는 혀를 t 위치에 댔다가 곧바로 す의 마찰을 내고, し는 입술을 둥글리지 않습니다.",
+    cues: [
+      ["つ", "‘트-스’처럼 나누지 말고 막힘과 마찰을 한 번에 연결해요."],
+      ["し", "입술보다 혀의 앞부분과 입천장 사이의 좁은 틈을 의식해요."],
+      ["무성화", "すき의 う는 자연 발화에서 아주 약하게 들릴 수 있어요."]
+    ],
+    mora: { word: "つき", tokens: ["つ", "き"], note: "つ 전체가 한 박자예요. t와 su를 두 박자로 나누지 않아요." },
+    practice: [["すき", "약해지는 う"], ["つき", "つ 한 박자"], ["した", "し의 마찰"]],
+    recordText: "すき、つき",
+    sources: [
+      ["도쿄외국어대 · つ", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-01-01.php"],
+      ["도쿄외국어대 · し", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/03-04-01.php"],
+      ["도쿄외국어대 · 모음 무성화", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/03-03-01.php"]
+    ]
+  },
+  {
+    focus: "ふ는 영어 f도, 한국어 후도 아니에요",
+    headline: "윗니를 아랫입술에 대지 않고 두 입술을 가까이해 촛불을 끄듯 마찰을 냅니다.",
+    cues: [
+      ["입술", "윗입술과 아랫입술 사이에 작은 틈을 만들어요."],
+      ["바람", "세게 터뜨리지 말고 좁은 틈으로 부드럽게 흘려요."],
+      ["ひ", "혀의 가운데를 입천장에 가까이해 し와 다른 마찰을 만들어요."]
+    ],
+    mora: { word: "ふね", tokens: ["ふ", "ね"], note: "ふ의 마찰과 모음을 한 박자 안에 넣고 ね와 길이를 맞춰요." },
+    practice: [["ふ", "두 입술 마찰"], ["ふね", "두 박자"], ["ひと", "ひ의 위치"]],
+    recordText: "ふね",
+    sources: [
+      ["도쿄외국어대 · は・ひ・ふ", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/03-06-01.php"]
+    ]
+  },
+  {
+    focus: "일본어 리듬의 단위는 모라",
+    headline: "강세를 주기보다 각 모라를 거의 같은 시간으로 놓는 것이 일본어다운 리듬의 시작입니다.",
+    cues: [
+      ["박자", "손가락을 한 번씩 짚으며 각 소리를 같은 간격으로 내요."],
+      ["세기", "중요한 글자를 세게 읽거나 길게 늘이지 않아요."],
+      ["연결", "빠르게 말해도 박자의 개수는 머릿속에서 유지해요."]
+    ],
+    mora: { word: "やすみ", tokens: ["や", "す", "み"], note: "야-스미가 아니라 や｜す｜み의 세 박자예요." },
+    practice: [["みせ", "두 박자"], ["やすみ", "세 박자"], ["やさい", "세 박자"]],
+    recordText: "やすみ",
+    sources: [
+      ["도쿄외국어대 · 모라", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-10-01.php"]
+    ]
+  },
+  {
+    focus: "ら행은 혀끝을 한 번만 튕겨요",
+    headline: "혀끝이 윗잇몸 뒤쪽을 짧게 한 번 스치고 즉시 떨어집니다. ん은 뒤 소리에 맞춰 모양이 변합니다.",
+    cues: [
+      ["ら행", "혀를 붙인 채 끌지 말고 한 번만 가볍게 접촉해요."],
+      ["ん", "항상 한국어 ㄴ으로 고정하지 말고 다음 소리를 준비해요."],
+      ["길이", "ん도 빠뜨리지 않고 독립된 한 박자로 셉니다."]
+    ],
+    mora: { word: "えん", tokens: ["え", "ん"], note: "짧은 ‘엔’ 한 덩어리가 아니라 え와 ん의 두 박자예요." },
+    practice: [["らりるれろ", "혀끝 한 번"], ["くるま", "세 박자"], ["えん", "ん 한 박자"]],
+    recordText: "くるま",
+    sources: [
+      ["도쿄외국어대 · ら행", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-02-01.php"],
+      ["도쿄외국어대 · ん", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/02-03-01.php"]
+    ]
+  },
+  {
+    focus: "탁음은 목의 울림으로 구별해요",
+    headline: "か/が, さ/ざ를 번갈아 말하며 손끝으로 목의 진동 유무를 확인합니다.",
+    cues: [
+      ["か→が", "입 모양은 가깝지만 が에서는 성대가 먼저 울려요."],
+      ["さ→ざ", "마찰을 유지한 채 목의 울림을 더해요."],
+      ["주의", "한글 가·자와 같다고 단정하지 말고 일본어 소리를 그대로 복사해요."]
+    ],
+    mora: { word: "かぎ", tokens: ["か", "ぎ"], note: "두 박자의 길이는 같고 두 번째 박자에서 목의 울림이 생겨요." },
+    practice: [["か、が", "울림 비교"], ["さ、ざ", "울림 비교"], ["みず", "ず 확인"]],
+    recordText: "か、が、かぎ",
+    sources: [
+      ["도쿄외국어대 · か/が", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-06-01.php"],
+      ["도쿄외국어대 · ざ행", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-03-01.php"]
+    ]
+  },
+  {
+    focus: "같은 글자라도 높낮이가 뜻을 바꿔요",
+    headline: "도쿄식 공통어 악센트는 세게 읽는 위치가 아니라 음이 내려가는 위치를 듣습니다.",
+    cues: [
+      ["높낮이", "목소리 크기는 그대로 두고 음의 높이만 움직여요."],
+      ["はし", "‘다리’는 낮→높, ‘젓가락’은 높→낮으로 구별돼요."],
+      ["문장", "단어를 문장에 넣으면 억양과 연결되므로 낱말과 문장을 둘 다 들어요."]
+    ],
+    mora: { word: "でんわ", tokens: ["で", "ん", "わ"], note: "ん을 생략하지 않는 세 박자. 뒤의 わ를 준비하며 코 울림이 이어져요." },
+    practice: [["でんわ", "세 박자"], ["たべる", "세 박자"], ["はし", "고저 두 방식"]],
+    recordText: "でんわ",
+    pitch: [
+      { label: "다리 · 橋", word: "はし", levels: [["は", "low"], ["し", "high"]], note: "낮 → 높" },
+      { label: "젓가락 · 箸", word: "はし", levels: [["は", "high"], ["し", "low"]], note: "높 → 낮" }
+    ],
+    sources: [
+      ["도쿄외국어대 · 표준어 악센트", "https://www.coelang.tufs.ac.jp/ja/en/pmod/practical/01-08-01.php"],
+      ["OJAD · 일본어 악센트 사전", "https://www.gavo.t.u-tokyo.ac.jp/ojad/kor/pages/home"]
+    ]
+  }
+];
+
 DAYS.push(...window.EXTRA_DAYS);
 
 const state = JSON.parse(localStorage.getItem("commute-japanese-week1") || '{"day":0,"done":[],"mistakes":{},"score":""}');
@@ -65,6 +182,8 @@ state.routine ||= {};
 state.listeningScores ||= {};
 state.speechRate ||= 0.72;
 state.speechVoiceURI ||= "";
+state.precisionMode ??= true;
+state.showKoreanReading ??= false;
 state.testMode ||= false;
 state.weekScores ||= {};
 const lesson = document.querySelector("#lesson");
@@ -73,6 +192,10 @@ const weekTabs = document.querySelector("#weekTabs");
 const monthTabs = document.querySelector("#monthTabs");
 let audioToastTimer;
 let listeningSession = null;
+let pronunciationRecorder = null;
+let pronunciationStream = null;
+let pronunciationChunks = [];
+let pronunciationRecordingUrl = "";
 
 function showAudioStatus(message) {
   const toast = document.querySelector("#audioToast");
@@ -115,7 +238,7 @@ function voiceOptionLabel(voice, index) {
   return `${index === 0 ? "추천 · " : ""}${shortName}`;
 }
 
-function speakJP(text) {
+function speakJP(text, rateOverride = null) {
   if (!("speechSynthesis" in window)) {
     showAudioStatus("이 브라우저는 음성 재생을 지원하지 않아요.");
     return;
@@ -123,7 +246,7 @@ function speakJP(text) {
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "ja-JP";
-  utterance.rate = state.speechRate;
+  utterance.rate = rateOverride ?? state.speechRate;
   utterance.pitch = 1;
   const japaneseVoice = getJapaneseVoice();
   if (japaneseVoice) utterance.voice = japaneseVoice;
@@ -132,6 +255,171 @@ function speakJP(text) {
   showAudioStatus(japaneseVoice
     ? `재생 중 · ${voiceOptionLabel(japaneseVoice, -1)}`
     : "재생 중 · 기기 기본 일본어 음성");
+}
+
+function togglePrecisionMode() {
+  abandonPronunciationRecording();
+  state.precisionMode = !state.precisionMode;
+  save();
+  renderLesson();
+}
+
+function toggleKoreanReading() {
+  abandonPronunciationRecording();
+  state.showKoreanReading = !state.showKoreanReading;
+  save();
+  renderLesson();
+}
+
+function renderPitchExamples(pitch) {
+  if (!pitch?.length) return "";
+  return `
+    <div class="pitch-lab">
+      <div class="precision-subhead"><b>고저 악센트</b><span>크기가 아니라 높이를 움직여요</span></div>
+      <div class="pitch-examples">
+        ${pitch.map(example => `
+          <div class="pitch-card">
+            <span>${example.label}</span>
+            <div class="pitch-track" aria-label="${example.word} ${example.note}">
+              ${example.levels.map(([mora, level]) => `<b class="${level}">${mora}</b>`).join("")}
+            </div>
+            <small>${example.note}</small>
+            <button type="button" onclick="speakJP('${example.word}', 1)">반복용 음성 ▶</button>
+          </div>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderPrecisionPanel(pronunciation) {
+  return `
+    <section class="precision-lab">
+      <div class="precision-lab-head">
+        <div>
+          <span class="precision-kicker">PRECISION PRONUNCIATION · BETA</span>
+          <h3>${pronunciation.focus}</h3>
+          <p>${pronunciation.headline}</p>
+        </div>
+        <button class="reading-toggle" type="button" onclick="toggleKoreanReading()">
+          ${state.showKoreanReading ? "한글 독음 숨기기" : "한글 독음 보기"}
+        </button>
+      </div>
+      <div class="cue-grid">
+        ${pronunciation.cues.map(([label, text]) => `
+          <div class="cue-card"><b>${label}</b><span>${text}</span></div>`).join("")}
+      </div>
+      <div class="mora-lab">
+        <div>
+          <span class="precision-subtitle">MORA RHYTHM</span>
+          <strong lang="ja">${pronunciation.mora.word}</strong>
+        </div>
+        <div class="mora-track" aria-label="${pronunciation.mora.word} 모라 ${pronunciation.mora.tokens.length}개">
+          ${pronunciation.mora.tokens.map((token, index) => `
+            <span><i>${index + 1}</i><b lang="ja">${token}</b></span>`).join("")}
+        </div>
+        <p>${pronunciation.mora.note}</p>
+      </div>
+      ${renderPitchExamples(pronunciation.pitch)}
+      <div class="precision-practice">
+        <div class="precision-subhead"><b>소리 먼저 듣기</b><span>정상 속도로 듣고 바로 따라 하세요</span></div>
+        <div class="practice-chips">
+          ${pronunciation.practice.map(([text, label]) => `
+            <button type="button" onclick="speakJP('${text}', 1)"><strong lang="ja">${text}</strong><span>${label} · ▶</span></button>`).join("")}
+        </div>
+        <p class="tts-caution">여기의 재생은 기기 TTS를 사용한 반복 연습용입니다. 아래 공식 자료를 발음 원리의 기준으로 삼으세요.</p>
+      </div>
+      <div class="record-compare">
+        <div>
+          <span class="precision-subtitle">RECORD & COMPARE</span>
+          <h4><span lang="ja">${pronunciation.recordText}</span>를 녹음해 비교하기</h4>
+          <p>녹음은 서버로 전송되지 않고 이 화면에만 잠시 남습니다.</p>
+        </div>
+        <div class="record-actions">
+          <button type="button" class="reference-button" onclick="speakJP('${pronunciation.recordText}', 1)">① 반복용 음성 듣기</button>
+          <button type="button" class="record-button" id="recordPronunciation" onclick="togglePronunciationRecording()">② 내 발음 녹음</button>
+        </div>
+        <div class="record-status" id="recordStatus">정상 속도로 한 번 듣고 같은 박자로 녹음하세요.</div>
+        <div class="recording-playback" id="recordingPlayback"></div>
+      </div>
+      <div class="source-links">
+        <span>공식 발음 자료</span>
+        ${pronunciation.sources.map(([label, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`).join("")}
+      </div>
+    </section>`;
+}
+
+function stopPronunciationTracks() {
+  pronunciationStream?.getTracks().forEach(track => track.stop());
+  pronunciationStream = null;
+}
+
+function abandonPronunciationRecording() {
+  if (pronunciationRecorder?.state === "recording") {
+    pronunciationRecorder.onstop = null;
+    pronunciationRecorder.ondataavailable = null;
+    pronunciationRecorder.stop();
+  }
+  pronunciationRecorder = null;
+  pronunciationChunks = [];
+  stopPronunciationTracks();
+  if (pronunciationRecordingUrl) URL.revokeObjectURL(pronunciationRecordingUrl);
+  pronunciationRecordingUrl = "";
+}
+
+function clearPronunciationRecording() {
+  if (pronunciationRecordingUrl) URL.revokeObjectURL(pronunciationRecordingUrl);
+  pronunciationRecordingUrl = "";
+  const host = document.querySelector("#recordingPlayback");
+  if (host) host.innerHTML = "";
+  const status = document.querySelector("#recordStatus");
+  if (status) status.textContent = "정상 속도로 한 번 듣고 같은 박자로 녹음하세요.";
+}
+
+async function togglePronunciationRecording() {
+  if (pronunciationRecorder?.state === "recording") {
+    pronunciationRecorder.stop();
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia || !("MediaRecorder" in window)) {
+    showAudioStatus("이 브라우저에서는 녹음 비교를 사용할 수 없어요.");
+    return;
+  }
+  try {
+    clearPronunciationRecording();
+    pronunciationStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    pronunciationChunks = [];
+    pronunciationRecorder = new MediaRecorder(pronunciationStream);
+    pronunciationRecorder.ondataavailable = event => {
+      if (event.data.size) pronunciationChunks.push(event.data);
+    };
+    pronunciationRecorder.onstop = () => {
+      const blob = new Blob(pronunciationChunks, { type: pronunciationRecorder.mimeType || "audio/webm" });
+      pronunciationRecordingUrl = URL.createObjectURL(blob);
+      stopPronunciationTracks();
+      const button = document.querySelector("#recordPronunciation");
+      const status = document.querySelector("#recordStatus");
+      const host = document.querySelector("#recordingPlayback");
+      if (button) {
+        button.textContent = "② 다시 녹음";
+        button.classList.remove("recording");
+      }
+      if (status) status.textContent = "기준 음성과 내 녹음을 번갈아 들으며 박자와 입 모양을 비교하세요.";
+      if (host) host.innerHTML = `
+        <audio controls src="${pronunciationRecordingUrl}" aria-label="내 발음 녹음"></audio>
+        <button type="button" onclick="clearPronunciationRecording()">녹음 지우기</button>`;
+      setRoutine(1, true);
+    };
+    pronunciationRecorder.start();
+    const button = document.querySelector("#recordPronunciation");
+    const status = document.querySelector("#recordStatus");
+    if (button) {
+      button.textContent = "■ 녹음 끝내기";
+      button.classList.add("recording");
+    }
+    if (status) status.textContent = "녹음 중… 목표 문장을 한 번 말한 뒤 끝내기를 누르세요.";
+  } catch {
+    stopPronunciationTracks();
+    showAudioStatus("마이크 권한을 허용해야 내 발음을 비교할 수 있어요.");
+  }
 }
 
 function speakToday() {
@@ -263,6 +551,7 @@ function renderTabs() {
 }
 
 function selectWeek(week) {
+  abandonPronunciationRecording();
   const firstDay = week * 7;
   if (state.day < firstDay || state.day > firstDay + 6) state.day = firstDay;
   save();
@@ -273,6 +562,7 @@ function selectWeek(week) {
 }
 
 function selectMonth(month) {
+  abandonPronunciationRecording();
   const firstDay = month * 28;
   if (state.day < firstDay || state.day > firstDay + 27) state.day = firstDay;
   save();
@@ -286,6 +576,9 @@ function selectMonth(month) {
 function renderLesson() {
   const day = DAYS[state.day];
   const isPhrase = day.kind === "phrase";
+  const pronunciation = state.day < PRONUNCIATION_DAYS.length ? PRONUNCIATION_DAYS[state.day] : null;
+  const precisionEnabled = Boolean(pronunciation && state.precisionMode);
+  const showKoreanReading = !precisionEnabled || state.showKoreanReading;
   const done = state.done.includes(state.day);
   const routine = state.routine[state.day] || [false, false, false, false];
   const weakToday = day.letters.filter(([jp]) => state.weak.includes(jp));
@@ -298,7 +591,9 @@ function renderLesson() {
         <div>
           <div class="meta">DAY ${String(state.day + 1).padStart(2, "0")} · 20~30 MIN</div>
           <h2>${day.title}</h2>
-          <p>${isPhrase ? "상황을 떠올리고 일본어 문장 전체를 따라 말하세요." : "글자를 보고 소리부터 말한 뒤 힌트를 확인하세요."}</p>
+          <p>${precisionEnabled
+            ? "한글 독음보다 소리·입 모양·박자를 먼저 익히세요."
+            : isPhrase ? "상황을 떠올리고 일본어 문장 전체를 따라 말하세요." : "글자를 보고 소리부터 말한 뒤 힌트를 확인하세요."}</p>
         </div>
         <div class="audio-actions">
           <select id="speechVoice" aria-label="일본어 목소리" ${japaneseVoices.length ? "" : "disabled"}>
@@ -314,16 +609,24 @@ function renderLesson() {
           </select>
           <button class="listen-all" type="button" onclick="speakToday()">🔊 오늘 ${isPhrase ? "표현" : "글자"} 전체 듣기</button>
           <span class="voice-status">${activeVoice
-            ? `일본어(일본) · ${activeVoice.localService ? "기기 음성" : "온라인 음성"}`
-            : "일본어 전용 음성이 없으면 기기 기본 음성으로 재생돼요."}</span>
+            ? `반복 연습용 · 일본어(일본) ${activeVoice.localService ? "기기 음성" : "온라인 음성"}`
+            : "반복 연습용 · 일본어 전용 음성이 없으면 기기 기본 음성으로 재생돼요."}</span>
         </div>
       </div>
     </div>
     <div class="lesson-body ${state.testMode ? "test-mode" : ""}">
+      ${pronunciation ? `
+        <div class="precision-toolbar ${precisionEnabled ? "active" : ""}">
+          <div><span>WEEK 1 BETA</span><b>정밀 발음 모드</b><small>소리 → 조음 → 모라 → 한글 힌트 순서</small></div>
+          <button type="button" onclick="togglePrecisionMode()">${precisionEnabled ? "켜짐 · 기본 모드로" : "꺼짐 · 정밀 모드 켜기"}</button>
+        </div>` : ""}
+      ${precisionEnabled ? renderPrecisionPanel(pronunciation) : ""}
       <div class="study-routine">
         <div><b>오늘의 20분 루틴</b><span>전부 완벽하게 하려 하지 말고 순서만 지켜요.</span></div>
         <div class="routine-list">
-          ${["전체 듣기 1회", `${isPhrase ? "표현" : "글자"} 따라 말하기 2회`, "듣기 퀴즈 3점 이상", "핵심 단어 따라 말하기 1회"].map((label, i) => `
+          ${(precisionEnabled
+            ? ["정상 속도 듣기 3회", "내 발음 녹음 비교", "듣기 퀴즈 3점 이상", "모라 박자 3회"]
+            : ["전체 듣기 1회", `${isPhrase ? "표현" : "글자"} 따라 말하기 2회`, "듣기 퀴즈 3점 이상", "핵심 단어 따라 말하기 1회"]).map((label, i) => `
             <label><input type="checkbox" data-routine="${i}" ${routine[i] ? "checked" : ""} onchange="setRoutine(${i}, this.checked)"><span>${label}</span></label>`).join("")}
         </div>
       </div>
@@ -331,17 +634,21 @@ function renderLesson() {
         <h3>오늘의 ${isPhrase ? "핵심 표현" : "새 글자"}</h3>
         <button class="test-toggle ${state.testMode ? "active" : ""}" type="button" onclick="toggleTestMode()">${state.testMode ? "힌트 보이기" : "힌트 가리고 테스트"}</button>
       </div>
-      <p class="audio-guide">재생 버튼을 누르고 한 번 들은 뒤, 두 번째에는 바로 따라 말해 보세요.</p>
+      <p class="audio-guide">${precisionEnabled
+        ? "먼저 ▶만 눌러 듣고 소리를 흉내 낸 다음 글자를 확인하세요. 기기 음성은 반복 연습용입니다."
+        : "재생 버튼을 누르고 한 번 들은 뒤, 두 번째에는 바로 따라 말해 보세요."}</p>
       <div class="letters-grid ${isPhrase ? "phrase-grid" : ""}">
         ${day.letters.map(([jp, en, ko, hint]) => `
           <article class="letter-card ${isPhrase ? "phrase-card" : ""}">
             <strong lang="ja">${jp}</strong>
             <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
-            <span class="sound">${en ? `${en} · ` : ""}${ko}</span><small>${hint}</small>
+            <span class="sound">${en || ""}${showKoreanReading ? `${en ? " · " : ""}${ko}` : '<i>한글 독음 숨김</i>'}</span><small>${hint}</small>
             <button class="weak-button ${state.weak.includes(jp) ? "active" : ""}" type="button" onclick="toggleWeak('${jp}')" aria-label="${jp} 복습 표시">${state.weak.includes(jp) ? "★ 복습 중" : "☆ 헷갈려요"}</button>
           </article>`).join("")}
       </div>
-      <div class="tip"><b>${isPhrase ? "회화 포인트" : "발음 포인트"}</b>${day.tip}</div>
+      <div class="tip"><b>${precisionEnabled ? "정밀 모드 원칙" : isPhrase ? "회화 포인트" : "발음 포인트"}</b>${precisionEnabled
+        ? "한글 독음은 기억을 돕는 힌트일 뿐 정답 소리가 아닙니다. 위의 입 모양·혀 위치·모라를 기준으로 연습하세요."
+        : day.tip}</div>
       <div class="weak-tray">
         <div><b>복습 바구니</b><span>헷갈리는 ${isPhrase ? "표현" : "글자"}만 모아 다음 날 먼저 들어요.</span></div>
         <div class="weak-chips">
@@ -354,7 +661,7 @@ function renderLesson() {
       <div class="word-list">
         ${day.words.map(([jp, ko, meaning]) => `
           <div class="word">
-            <strong lang="ja">${jp}</strong><span>${ko}</span><em>${meaning}</em>
+            <strong lang="ja">${jp}</strong><span>${showKoreanReading ? ko : "소리 먼저"}</span><em>${meaning}</em>
             <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
           </div>`).join("")}
       </div>
@@ -412,6 +719,7 @@ function renderLesson() {
 }
 
 function selectDay(index, scroll = true) {
+  abandonPronunciationRecording();
   state.day = index;
   save();
   renderMonthTabs();

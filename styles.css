@@ -215,6 +215,171 @@ main { overflow: hidden; }
   background: white;
   box-shadow: var(--shadow);
 }
+.precision-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 15px 17px;
+  border: 1px solid #e1e8eb;
+  border-radius: 16px;
+  background: #f7f9fa;
+}
+.precision-toolbar.active { border-color: #f2c6b0; background: #fff6f0; }
+.precision-toolbar > div { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.precision-toolbar span { color: var(--coral); font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.precision-toolbar b { color: var(--navy); font-size: 14px; }
+.precision-toolbar small { color: var(--muted); font-size: 10px; }
+.precision-toolbar button, .reading-toggle {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid #e9b99f;
+  border-radius: 99px;
+  color: #8e4f34;
+  background: white;
+  font-size: 10px;
+  font-weight: 800;
+}
+.precision-lab {
+  margin-bottom: 28px;
+  padding: 26px;
+  border: 1px solid #f0c3aa;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #fffaf6, #fff);
+}
+.precision-lab-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.precision-kicker, .precision-subtitle {
+  color: var(--coral);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.precision-lab-head h3 { margin: 7px 0 6px; color: var(--navy); font-size: 24px; }
+.precision-lab-head p { max-width: 700px; margin: 0; color: #51636d; font-size: 13px; line-height: 1.7; }
+.cue-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 20px; }
+.cue-card { padding: 14px; border: 1px solid #ece4df; border-radius: 13px; background: white; }
+.cue-card b { display: block; margin-bottom: 6px; color: var(--teal); font-size: 11px; }
+.cue-card span { color: var(--muted); font-size: 11px; line-height: 1.55; }
+.mora-lab {
+  display: grid;
+  grid-template-columns: 120px minmax(190px, 1fr) 1.3fr;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+  padding: 20px;
+  border-radius: 16px;
+  color: white;
+  background: var(--navy);
+}
+.mora-lab > div:first-child strong { display: block; margin-top: 5px; font: 700 28px "Noto Sans JP"; }
+.mora-track { display: flex; gap: 6px; }
+.mora-track span {
+  display: grid;
+  place-items: center;
+  min-width: 50px;
+  height: 58px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+}
+.mora-track i { color: #79d4b4; font-size: 8px; font-style: normal; }
+.mora-track b { font: 700 21px "Noto Sans JP"; }
+.mora-lab p { margin: 0; color: #c5d5dd; font-size: 11px; line-height: 1.65; }
+.precision-subhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.precision-subhead b { color: var(--navy); font-size: 14px; }
+.precision-subhead span { color: var(--muted); font-size: 10px; }
+.pitch-lab, .precision-practice { margin-top: 22px; }
+.pitch-examples { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-top: 10px; }
+.pitch-card {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e1e7ea;
+  border-radius: 13px;
+  background: white;
+}
+.pitch-card > span { color: var(--muted); font-size: 11px; }
+.pitch-track { display: flex; align-items: center; gap: 4px; height: 40px; }
+.pitch-track b {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: white;
+  background: var(--teal);
+  font: 700 16px "Noto Sans JP";
+}
+.pitch-track b.high { align-self: flex-start; }
+.pitch-track b.low { align-self: flex-end; background: #78909d; }
+.pitch-card small { color: var(--coral); font-size: 10px; font-weight: 800; }
+.pitch-card button {
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--navy);
+  background: var(--mint);
+  font-size: 9px;
+  font-weight: 800;
+}
+.practice-chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.practice-chips button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid #dce5e8;
+  border-radius: 12px;
+  color: var(--navy);
+  background: white;
+}
+.practice-chips strong { font: 700 17px "Noto Sans JP"; }
+.practice-chips span { color: var(--muted); font-size: 9px; }
+.tts-caution { margin: 10px 0 0; color: #8b6b5c; font-size: 10px; line-height: 1.6; }
+.record-compare {
+  margin-top: 22px;
+  padding: 19px;
+  border: 1px solid #d9e8e3;
+  border-radius: 16px;
+  background: #f1f8f5;
+}
+.record-compare h4 { margin: 5px 0; color: var(--navy); font-size: 16px; }
+.record-compare h4 span { font-family: "Noto Sans JP"; }
+.record-compare p, .record-status { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+.record-actions { display: flex; gap: 8px; margin-top: 14px; }
+.record-actions button, .recording-playback button {
+  padding: 10px 13px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.reference-button { color: var(--navy); background: #dceae5; }
+.record-button { color: white; background: var(--coral); }
+.record-button.recording { background: #b33b35; }
+.record-status { margin-top: 10px; }
+.recording-playback { display: flex; align-items: center; gap: 9px; margin-top: 10px; }
+.recording-playback audio { width: min(360px, 100%); height: 38px; }
+.recording-playback button { color: var(--muted); background: white; }
+.source-links { display: flex; align-items: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.source-links > span { color: var(--muted); font-size: 10px; font-weight: 800; }
+.source-links a {
+  padding: 7px 9px;
+  border-radius: 9px;
+  color: #245846;
+  background: var(--mint);
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
 .study-routine {
   margin-bottom: 36px;
   padding: 20px;
@@ -247,6 +412,16 @@ main { overflow: hidden; }
 .letter-card { position: relative; min-height: 132px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #fcfdfc; }
 .letter-card strong { display: block; color: var(--navy); font: 700 38px/1.15 "Noto Sans JP"; }
 .letter-card .sound { display: block; margin-top: 7px; color: var(--teal); font-size: 12px; font-weight: 800; }
+.letter-card .sound i {
+  margin-left: 6px;
+  padding: 3px 6px;
+  border-radius: 7px;
+  color: var(--muted);
+  background: #edf1f2;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
 .letter-card small { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.45; }
 .phrase-card { min-height: 165px; padding: 20px; }
 .phrase-card strong { max-width: calc(100% - 40px); font-size: 20px; line-height: 1.5; }
@@ -467,6 +642,24 @@ footer a { color: white; text-decoration: none; }
   .audio-actions select { flex: 1 1 120px; max-width: none; min-width: 0; }
   .listen-all { flex: 1; }
   .voice-status { text-align: left; }
+  .precision-toolbar { align-items: flex-start; flex-direction: column; }
+  .precision-toolbar button { align-self: flex-start; }
+  .precision-lab { padding: 20px 16px; }
+  .precision-lab-head { flex-direction: column; }
+  .precision-lab-head h3 { font-size: 21px; }
+  .cue-grid { grid-template-columns: 1fr; }
+  .mora-lab { grid-template-columns: 1fr; gap: 12px; }
+  .mora-track span { flex: 1; min-width: 0; }
+  .pitch-examples { grid-template-columns: 1fr; }
+  .pitch-card { grid-template-columns: minmax(80px, 1fr) auto auto; }
+  .pitch-card button { grid-column: 1 / -1; }
+  .precision-subhead { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .practice-chips { display: grid; grid-template-columns: 1fr; }
+  .practice-chips button { justify-content: space-between; }
+  .record-actions, .recording-playback { align-items: stretch; flex-direction: column; }
+  .record-actions button { width: 100%; }
+  .source-links { align-items: stretch; flex-direction: column; }
+  .source-links a { padding: 10px; }
   .study-routine > div:first-child, .weak-tray > div:first-child { align-items: flex-start; flex-direction: column; }
   .routine-list { grid-template-columns: repeat(2, 1fr); }
   .letters-grid { grid-template-columns: repeat(2, 1fr); }
