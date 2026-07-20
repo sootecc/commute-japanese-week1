@@ -58,9 +58,15 @@ const DAYS = [
 ];
 
 const state = JSON.parse(localStorage.getItem("commute-japanese-week1") || '{"day":0,"done":[],"mistakes":{},"score":""}');
+state.weak ||= [];
+state.routine ||= {};
+state.listeningScores ||= {};
+state.speechRate ||= 0.72;
+state.testMode ||= false;
 const lesson = document.querySelector("#lesson");
 const tabs = document.querySelector("#dayTabs");
 let audioToastTimer;
+let listeningSession = null;
 
 function showAudioStatus(message) {
   const toast = document.querySelector("#audioToast");
@@ -78,7 +84,7 @@ function speakJP(text) {
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "ja-JP";
-  utterance.rate = 0.72;
+  utterance.rate = state.speechRate;
   utterance.pitch = 1;
   const voices = window.speechSynthesis.getVoices();
   const japaneseVoice = voices.find(voice => voice.lang.toLowerCase().startsWith("ja"));
@@ -86,6 +92,83 @@ function speakJP(text) {
   utterance.onerror = () => showAudioStatus("일본어 음성을 재생하지 못했어요. 기기의 일본어 음성을 확인해 주세요.");
   window.speechSynthesis.speak(utterance);
   showAudioStatus(`재생 중 · ${text.replaceAll("、", " ")}`);
+}
+
+function speakToday() {
+  const text = DAYS[state.day].letters.map(([jp]) => jp).join("、");
+  speakJP(text);
+  setRoutine(0, true);
+}
+
+function toggleWeak(jp) {
+  state.weak = state.weak.includes(jp) ? state.weak.filter(item => item !== jp) : [...state.weak, jp];
+  save();
+  renderLesson();
+}
+
+function setRoutine(index, checked) {
+  const routine = state.routine[state.day] || [false, false, false, false];
+  routine[index] = checked;
+  state.routine[state.day] = routine;
+  save();
+  const box = document.querySelector(`[data-routine="${index}"]`);
+  if (box) box.checked = checked;
+}
+
+function toggleTestMode() {
+  state.testMode = !state.testMode;
+  save();
+  renderLesson();
+}
+
+function shuffled(items) {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
+function startListeningQuiz() {
+  listeningSession = { day: state.day, round: 0, score: 0 };
+  renderListeningQuestion();
+}
+
+function renderListeningQuestion() {
+  const host = document.querySelector("#listeningQuizBody");
+  if (!host || !listeningSession || listeningSession.day !== state.day) return;
+  if (listeningSession.round >= 5) {
+    const score = listeningSession.score;
+    state.listeningScores[state.day] = Math.max(state.listeningScores[state.day] || 0, score);
+    if (score >= 3) setRoutine(2, true);
+    save();
+    host.innerHTML = `
+      <div class="listening-result"><strong>${score} / 5점</strong>
+      <span>${score >= 4 ? "소리와 글자 연결이 잘 되고 있어요." : score >= 3 ? "통과! 틀린 글자만 한 번 더 들어 보세요." : "복습 바구니에 헷갈린 글자를 넣고 다시 도전해요."}</span></div>
+      <button class="quiz-start" type="button" onclick="startListeningQuiz()">다시 도전</button>`;
+    return;
+  }
+  const letters = DAYS[state.day].letters.map(([jp]) => jp);
+  const target = letters[Math.floor(Math.random() * letters.length)];
+  const choices = shuffled([target, ...shuffled(letters.filter(item => item !== target)).slice(0, 3)]);
+  listeningSession.target = target;
+  listeningSession.round += 1;
+  host.innerHTML = `
+    <div class="listening-progress">문제 ${listeningSession.round} / 5 · 현재 ${listeningSession.score}점</div>
+    <button class="listen-prompt" type="button" onclick="speakJP('${target}')">🔊 소리 다시 듣기</button>
+    <div class="listening-choices">
+      ${choices.map(choice => `<button type="button" onclick="answerListening('${choice}', this)">${choice}</button>`).join("")}
+    </div>
+    <div class="listening-feedback" id="listeningFeedback">소리를 듣고 글자를 골라 보세요.</div>`;
+  speakJP(target);
+}
+
+function answerListening(choice, button) {
+  if (!listeningSession || button.parentElement.classList.contains("answered")) return;
+  const correct = choice === listeningSession.target;
+  if (correct) listeningSession.score += 1;
+  button.parentElement.classList.add("answered");
+  button.classList.add(correct ? "correct" : "wrong");
+  const correctButton = [...button.parentElement.children].find(item => item.textContent === listeningSession.target);
+  if (correctButton) correctButton.classList.add("correct");
+  document.querySelector("#listeningFeedback").textContent = correct ? "정답이에요!" : `정답은 ${listeningSession.target}`;
+  setTimeout(renderListeningQuestion, 850);
 }
 
 function save() {
@@ -112,6 +195,9 @@ function renderTabs() {
 function renderLesson() {
   const day = DAYS[state.day];
   const done = state.done.includes(state.day);
+  const routine = state.routine[state.day] || [false, false, false, false];
+  const weakToday = day.letters.filter(([jp]) => state.weak.includes(jp));
+  listeningSession = null;
   lesson.innerHTML = `
     <div class="lesson-head">
       <div class="lesson-head-row">
@@ -120,11 +206,28 @@ function renderLesson() {
           <h2>${day.title}</h2>
           <p>글자를 보고 소리부터 말한 뒤 힌트를 확인하세요.</p>
         </div>
-        <button class="listen-all" type="button" onclick="speakJP('${day.letters.map(([jp]) => jp).join("、")}')">🔊 오늘 글자 전체 듣기</button>
+        <div class="audio-actions">
+          <select id="speechRate" aria-label="음성 속도">
+            <option value="0.62" ${state.speechRate === 0.62 ? "selected" : ""}>느리게</option>
+            <option value="0.72" ${state.speechRate === 0.72 ? "selected" : ""}>천천히</option>
+            <option value="0.88" ${state.speechRate === 0.88 ? "selected" : ""}>보통</option>
+          </select>
+          <button class="listen-all" type="button" onclick="speakToday()">🔊 오늘 글자 전체 듣기</button>
+        </div>
       </div>
     </div>
-    <div class="lesson-body">
-      <div class="block-title"><h3>오늘의 새 글자</h3><span>${day.letters.length}개 · 약 10분</span></div>
+    <div class="lesson-body ${state.testMode ? "test-mode" : ""}">
+      <div class="study-routine">
+        <div><b>오늘의 20분 루틴</b><span>전부 완벽하게 하려 하지 말고 순서만 지켜요.</span></div>
+        <div class="routine-list">
+          ${["전체 듣기 1회", "글자 따라 말하기 2회", "듣기 퀴즈 3점 이상", "여행 단어 따라 말하기 1회"].map((label, i) => `
+            <label><input type="checkbox" data-routine="${i}" ${routine[i] ? "checked" : ""} onchange="setRoutine(${i}, this.checked)"><span>${label}</span></label>`).join("")}
+        </div>
+      </div>
+      <div class="block-title">
+        <h3>오늘의 새 글자</h3>
+        <button class="test-toggle ${state.testMode ? "active" : ""}" type="button" onclick="toggleTestMode()">${state.testMode ? "힌트 보이기" : "힌트 가리고 테스트"}</button>
+      </div>
       <p class="audio-guide">재생 버튼을 누르고 한 번 들은 뒤, 두 번째에는 바로 따라 말해 보세요.</p>
       <div class="letters-grid">
         ${day.letters.map(([jp, en, ko, hint]) => `
@@ -132,9 +235,17 @@ function renderLesson() {
             <strong lang="ja">${jp}</strong>
             <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
             <span class="sound">${en} · ${ko}</span><small>${hint}</small>
+            <button class="weak-button ${state.weak.includes(jp) ? "active" : ""}" type="button" onclick="toggleWeak('${jp}')" aria-label="${jp} 복습 표시">${state.weak.includes(jp) ? "★ 복습 중" : "☆ 헷갈려요"}</button>
           </article>`).join("")}
       </div>
       <div class="tip"><b>발음 포인트</b>${day.tip}</div>
+      <div class="weak-tray">
+        <div><b>복습 바구니</b><span>헷갈리는 글자만 모아 다음 날 먼저 들어요.</span></div>
+        <div class="weak-chips">
+          ${state.weak.length ? state.weak.map(jp => `<button type="button" onclick="speakJP('${jp}')">${jp} <span>▶</span></button>`).join("") : "<small>아직 표시한 글자가 없어요.</small>"}
+        </div>
+        ${weakToday.length ? `<p>오늘 글자 중 ${weakToday.length}개가 복습 중이에요.</p>` : ""}
+      </div>
       <div class="block-title"><h3>여행에서 만날 단어</h3><span>글자씩 짚으며 읽기</span></div>
       <div class="word-list">
         ${day.words.map(([jp, ko, meaning]) => `
@@ -142,6 +253,11 @@ function renderLesson() {
             <strong lang="ja">${jp}</strong><span>${ko}</span><em>${meaning}</em>
             <button class="audio-button" type="button" onclick="speakJP('${jp}')" aria-label="${jp} 발음 듣기">▶</button>
           </div>`).join("")}
+      </div>
+      <div class="listening-quiz">
+        <div class="quiz-head"><div><span class="mini-label">ACTIVE RECALL</span><h3>소리만 듣고 글자 고르기</h3></div><b>최고 ${state.listeningScores[state.day] || 0} / 5</b></div>
+        <p>화면을 보지 않고 먼저 소리를 들은 뒤 선택하세요. 3점 이상이면 오늘 루틴 통과입니다.</p>
+        <div id="listeningQuizBody"><button class="quiz-start" type="button" onclick="startListeningQuiz()">5문제 시작</button></div>
       </div>
       <div class="quiz">
         <div class="quiz-head"><h3>3초 읽기 퀴즈</h3><button class="reveal-button" id="reveal" type="button">정답 보기</button></div>
@@ -154,6 +270,11 @@ function renderLesson() {
         <button class="complete-button ${done ? "done" : ""}" id="complete" type="button">${done ? "오늘 학습 완료 ✓" : "오늘 학습 완료"}</button>
       </div>
     </div>`;
+  document.querySelector("#speechRate").addEventListener("change", event => {
+    state.speechRate = Number(event.target.value);
+    save();
+    showAudioStatus(`재생 속도 · ${event.target.options[event.target.selectedIndex].text}`);
+  });
   document.querySelector("#reveal").addEventListener("click", event => {
     const answer = document.querySelector("#answer");
     answer.hidden = !answer.hidden;
