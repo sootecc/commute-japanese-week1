@@ -181,8 +181,9 @@ main { overflow: hidden; }
 .lesson-head h2 { margin: 8px 0 7px; font-size: 32px; }
 .lesson-head p { margin: 0; color: #c8d6de; }
 .lesson-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
-.audio-actions { display: flex; align-items: center; gap: 8px; }
+.audio-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; max-width: 520px; }
 .audio-actions select {
+  max-width: 170px;
   padding: 10px 28px 10px 12px;
   border: 1px solid rgba(255,255,255,.25);
   border-radius: 99px;
@@ -190,6 +191,12 @@ main { overflow: hidden; }
   background: #24485f;
   font-size: 12px;
   font-weight: 800;
+}
+.voice-status {
+  flex: 0 0 100%;
+  color: #a9c3d0;
+  font-size: 11px;
+  text-align: right;
 }
 .listen-all {
   flex: 0 0 auto;
@@ -456,9 +463,10 @@ footer a { color: white; text-decoration: none; }
   .lesson-head, .lesson-body { padding: 24px 18px; }
   .lesson-head h2 { font-size: 27px; }
   .lesson-head-row { align-items: flex-start; flex-direction: column; }
-  .audio-actions { width: 100%; }
-  .audio-actions select { flex: 0 0 auto; }
+  .audio-actions { width: 100%; max-width: none; justify-content: flex-start; }
+  .audio-actions select { flex: 1 1 120px; max-width: none; min-width: 0; }
   .listen-all { flex: 1; }
+  .voice-status { text-align: left; }
   .study-routine > div:first-child, .weak-tray > div:first-child { align-items: flex-start; flex-direction: column; }
   .routine-list { grid-template-columns: repeat(2, 1fr); }
   .letters-grid { grid-template-columns: repeat(2, 1fr); }

@@ -64,6 +64,7 @@ state.weak ||= [];
 state.routine ||= {};
 state.listeningScores ||= {};
 state.speechRate ||= 0.72;
+state.speechVoiceURI ||= "";
 state.testMode ||= false;
 state.weekScores ||= {};
 const lesson = document.querySelector("#lesson");
@@ -81,6 +82,39 @@ function showAudioStatus(message) {
   audioToastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
+function getJapaneseVoices() {
+  if (!("speechSynthesis" in window)) return [];
+  const preferredNames = [
+    "nanami", "masaru", "keita", "aoi", "daichi", "mayu", "naoki", "shiori",
+    "google 日本語", "google japanese", "kyoko", "o-ren", "hattori",
+    "haruka", "sayaka", "ichiro"
+  ];
+  const score = voice => {
+    const name = voice.name.toLowerCase();
+    const preference = preferredNames.findIndex(item => name.includes(item));
+    return (voice.lang.toLowerCase() === "ja-jp" ? 100 : 0)
+      + (preference === -1 ? 0 : 80 - preference)
+      + (!voice.localService ? 8 : 0)
+      + (voice.default ? 2 : 0);
+  };
+  return window.speechSynthesis.getVoices()
+    .filter(voice => voice.lang.toLowerCase().startsWith("ja"))
+    .sort((a, b) => score(b) - score(a));
+}
+
+function getJapaneseVoice() {
+  const voices = getJapaneseVoices();
+  return voices.find(voice => voice.voiceURI === state.speechVoiceURI) || voices[0] || null;
+}
+
+function voiceOptionLabel(voice, index) {
+  const shortName = voice.name
+    .replace(/^Microsoft\s+/i, "")
+    .replace(/^Google\s+/i, "")
+    .replace(/\s+(Online|Desktop|Natural).*$/i, "");
+  return `${index === 0 ? "추천 · " : ""}${shortName}`;
+}
+
 function speakJP(text) {
   if (!("speechSynthesis" in window)) {
     showAudioStatus("이 브라우저는 음성 재생을 지원하지 않아요.");
@@ -91,12 +125,13 @@ function speakJP(text) {
   utterance.lang = "ja-JP";
   utterance.rate = state.speechRate;
   utterance.pitch = 1;
-  const voices = window.speechSynthesis.getVoices();
-  const japaneseVoice = voices.find(voice => voice.lang.toLowerCase().startsWith("ja"));
+  const japaneseVoice = getJapaneseVoice();
   if (japaneseVoice) utterance.voice = japaneseVoice;
   utterance.onerror = () => showAudioStatus("일본어 음성을 재생하지 못했어요. 기기의 일본어 음성을 확인해 주세요.");
   window.speechSynthesis.speak(utterance);
-  showAudioStatus(`재생 중 · ${text.replaceAll("、", " ")}`);
+  showAudioStatus(japaneseVoice
+    ? `재생 중 · ${voiceOptionLabel(japaneseVoice, -1)}`
+    : "재생 중 · 기기 기본 일본어 음성");
 }
 
 function speakToday() {
@@ -254,6 +289,8 @@ function renderLesson() {
   const done = state.done.includes(state.day);
   const routine = state.routine[state.day] || [false, false, false, false];
   const weakToday = day.letters.filter(([jp]) => state.weak.includes(jp));
+  const japaneseVoices = getJapaneseVoices();
+  const activeVoice = getJapaneseVoice();
   listeningSession = null;
   lesson.innerHTML = `
     <div class="lesson-head">
@@ -264,12 +301,21 @@ function renderLesson() {
           <p>${isPhrase ? "상황을 떠올리고 일본어 문장 전체를 따라 말하세요." : "글자를 보고 소리부터 말한 뒤 힌트를 확인하세요."}</p>
         </div>
         <div class="audio-actions">
+          <select id="speechVoice" aria-label="일본어 목소리" ${japaneseVoices.length ? "" : "disabled"}>
+            ${japaneseVoices.length
+              ? japaneseVoices.map((voice, index) => `<option value="${encodeURIComponent(voice.voiceURI)}" ${voice.voiceURI === activeVoice?.voiceURI ? "selected" : ""}>${voiceOptionLabel(voice, index)}</option>`).join("")
+              : '<option value="">기기 기본 음성</option>'}
+          </select>
           <select id="speechRate" aria-label="음성 속도">
             <option value="0.62" ${state.speechRate === 0.62 ? "selected" : ""}>느리게</option>
             <option value="0.72" ${state.speechRate === 0.72 ? "selected" : ""}>천천히</option>
             <option value="0.88" ${state.speechRate === 0.88 ? "selected" : ""}>보통</option>
+            <option value="1" ${state.speechRate === 1 ? "selected" : ""}>자연스럽게</option>
           </select>
           <button class="listen-all" type="button" onclick="speakToday()">🔊 오늘 ${isPhrase ? "표현" : "글자"} 전체 듣기</button>
+          <span class="voice-status">${activeVoice
+            ? `일본어(일본) · ${activeVoice.localService ? "기기 음성" : "온라인 음성"}`
+            : "일본어 전용 음성이 없으면 기기 기본 음성으로 재생돼요."}</span>
         </div>
       </div>
     </div>
@@ -338,6 +384,12 @@ function renderLesson() {
     state.speechRate = Number(event.target.value);
     save();
     showAudioStatus(`재생 속도 · ${event.target.options[event.target.selectedIndex].text}`);
+  });
+  document.querySelector("#speechVoice").addEventListener("change", event => {
+    state.speechVoiceURI = decodeURIComponent(event.target.value);
+    save();
+    showAudioStatus(`목소리 · ${event.target.options[event.target.selectedIndex].text}`);
+    speakJP(day.letters[0][0]);
   });
   document.querySelector("#reveal").addEventListener("click", event => {
     const answer = document.querySelector("#answer");
@@ -411,3 +463,11 @@ renderWeekTabs();
 renderTabs();
 renderLesson();
 renderWeekCheck();
+
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.addEventListener("voiceschanged", () => {
+    const voiceSelect = document.querySelector("#speechVoice");
+    if (!voiceSelect || (!voiceSelect.disabled && voiceSelect.options.length > 1)) return;
+    renderLesson();
+  });
+}
